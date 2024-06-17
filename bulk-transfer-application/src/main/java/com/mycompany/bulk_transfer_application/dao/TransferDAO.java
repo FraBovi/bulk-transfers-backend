@@ -1,13 +1,14 @@
 package com.mycompany.bulk_transfer_application.dao;
 
-import com.mycompany.bulk_transfer_application.entity.BankAccounts;
-import com.mycompany.bulk_transfer_application.entity.Transfers;
+import com.mycompany.bulk_transfer_application.entity.BankAccount;
+import com.mycompany.bulk_transfer_application.entity.Transfer;
 
 public interface TransferDAO {
 	
-	public BankAccounts getBankAccountsById(int id);
-	public BankAccounts updateBankAccount(BankAccounts account);
+	public BankAccount getBankAccountsById(int id);
+	public BankAccount getBankAccountsByBicIban(String orgBic, String orgIban);
+	public BankAccount updateBankAccount(BankAccount account);
 	
-	public int addTransfer(Transfers transfer);
+	public int addTransfer(Transfer transfer);
 
 }

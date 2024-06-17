@@ -11,7 +11,7 @@ import lombok.Data;
 @Entity
 @Table(name = "bank_accounts")
 @Data
-public class BankAccounts {
+public class BankAccount {
 	
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

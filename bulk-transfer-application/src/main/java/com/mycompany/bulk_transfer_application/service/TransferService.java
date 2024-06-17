@@ -1,13 +1,13 @@
 package com.mycompany.bulk_transfer_application.service;
 
-import com.mycompany.bulk_transfer_application.entity.BankAccounts;
-import com.mycompany.bulk_transfer_application.entity.Transfers;
+import com.mycompany.bulk_transfer_application.entity.BankAccount;
+import com.mycompany.bulk_transfer_application.entity.Transfer;
+import com.mycompany.bulk_transfer_application.pojo.Request;
+import com.mycompany.bulk_transfer_application.pojo.Response;
 
 public interface TransferService {
 	
-	public BankAccounts getBankAccountsById(int id);
-	public BankAccounts updateBankAccount(BankAccounts account);
-	
-	public int addTransfer(Transfers transfer);
+	public Integer getOrganizationBalance(int id);
+	public Response insertTransfers(Request request);
 
 }
