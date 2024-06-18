@@ -7,11 +7,12 @@ import org.springframework.stereotype.Repository;
 
 import com.mycompany.bulk_transfer_application.controller.TransferController;
 import com.mycompany.bulk_transfer_application.entity.BankAccount;
-import com.mycompany.bulk_transfer_application.entity.Transfer;
+import com.mycompany.bulk_transfer_application.entity.TransferEntity;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
+import jakarta.transaction.Transactional;
 
 @Repository
 public class TransferDAOImpl implements TransferDAO {
@@ -37,15 +38,9 @@ public class TransferDAOImpl implements TransferDAO {
 	}
 
 	@Override
+	@Transactional
 	public BankAccount updateBankAccount(BankAccount account) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public int addTransfer(Transfer transfer) {
-		// TODO Auto-generated method stub
-		return 0;
+		return entityManager.merge(account);
 	}
 
 	@Override
@@ -64,6 +59,14 @@ public class TransferDAOImpl implements TransferDAO {
 	    }
 	    
 	    return account;
+	}
+
+	@Override
+	@Transactional
+	public void insertTransfers(TransferEntity transfer) {
+		
+		entityManager.persist(transfer);
+	
 	}
 
 }

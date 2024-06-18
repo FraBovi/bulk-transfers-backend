@@ -13,7 +13,7 @@ import lombok.Data;
 @Entity
 @Table(name = "transfers")
 @Data
-public class Transfer {
+public class TransferEntity {
 	
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,6 +32,9 @@ public class Transfer {
 	@ManyToOne
 	@JoinColumn(name = "bank_account_id")
     private BankAccount bankAccountId;
+	
+	@Column(name = "amount_cents")
+	private int amountCents;
 	
 	@Column(name = "description")
 	private String description;

@@ -1,7 +1,6 @@
 package com.mycompany.bulk_transfer_application.service;
 
 import com.mycompany.bulk_transfer_application.entity.BankAccount;
-import com.mycompany.bulk_transfer_application.entity.Transfer;
 import com.mycompany.bulk_transfer_application.pojo.Request;
 import com.mycompany.bulk_transfer_application.pojo.Response;
 
