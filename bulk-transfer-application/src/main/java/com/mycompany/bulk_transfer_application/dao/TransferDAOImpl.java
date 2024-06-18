@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import com.mycompany.bulk_transfer_application.controller.TransferController;
 import com.mycompany.bulk_transfer_application.entity.BankAccount;
 import com.mycompany.bulk_transfer_application.entity.TransferEntity;
 

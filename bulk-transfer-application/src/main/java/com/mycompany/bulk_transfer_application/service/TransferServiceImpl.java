@@ -2,6 +2,8 @@ package com.mycompany.bulk_transfer_application.service;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +17,8 @@ import com.mycompany.bulk_transfer_application.pojo.Transfer;
 @Service
 public class TransferServiceImpl implements TransferService{
 	
+	private static final Logger logger = LoggerFactory.getLogger(TransferServiceImpl.class);
+	
 	private TransferDAO transferDAO;
 	
 	@Autowired
@@ -25,7 +29,11 @@ public class TransferServiceImpl implements TransferService{
 	@Override
 	public Integer getOrganizationBalance(int id) {
 		
+		logger.info("Getting bank account info from DB with ID {}", id);
+		
 		BankAccount dbOrganizationAccount = transferDAO.getBankAccountsById(id);
+		
+		logger.info("Bank Account information retrieved {}", dbOrganizationAccount);
 		
 		if(dbOrganizationAccount != null) {
 			return Integer.parseInt(dbOrganizationAccount.getBalanceCents());
@@ -40,27 +48,42 @@ public class TransferServiceImpl implements TransferService{
 		String organizationBic = request.getOrganizationBic();
 		String organizationIban = request.getOrganizationIban();
 		
+		logger.info("Getting bank account info from DB using BIC {} and IBAN {}", organizationBic, organizationIban);
+		
 		BankAccount account = transferDAO.getBankAccountsByBicIban(organizationBic, organizationIban);
+		
+		logger.info("Bank Account information retrieved {}", account);
 		
 		List<Transfer> incomingTransfers = request.getCreditTransfers();
 		
 		Integer totalAmountTransfer = calculateTotalAmount(incomingTransfers);
 		Integer accountBalance = Integer.parseInt(account.getBalanceCents());
 		
+		logger.info("Balance in cents {} - Total transfer amount in cents{}", accountBalance, totalAmountTransfer);
+		
 		Response response = new Response();
 		
 		if(totalAmountTransfer > accountBalance)  {
+	
+			logger.info("Operation not allowed - CREDIT NOT SUFFICIENT");
 			response.setCode(-99);
 			response.setDescription("Credit not sufficient");
+		
 		} else {
 			
+			logger.info("Operation allowed");
+			
 			for(Transfer transfer : incomingTransfers) {
+				
+				logger.info("Insert transfer {} in DB", transfer);
 				
 				TransferEntity transferEntity = createTransferEntity(transfer, account);
 				transferDAO.insertTransfers(transferEntity);
 				
 				accountBalance -= transferEntity.getAmountCents();
 				account.setBalanceCents(accountBalance.toString());
+				
+				logger.info("Update bank account {} in DB", account);
 				
 				transferDAO.updateBankAccount(account);
 				

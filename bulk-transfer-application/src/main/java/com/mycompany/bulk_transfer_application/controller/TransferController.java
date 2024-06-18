@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,7 +31,11 @@ public class TransferController {
 	@PostMapping(path = "/transfer", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> bulkTransfer(@RequestBody Request transferRequest) {
 		
+		logger.info("Request for /transfer arrived, with body {}", transferRequest);
+		
 		Response response = transferService.insertTransfers(transferRequest);
+		
+		logger.info("Sending response {}", response);
 		
 		if(response.getCode() == 1) return ResponseEntity.status(HttpStatus.CREATED).body(response);
 		else {
