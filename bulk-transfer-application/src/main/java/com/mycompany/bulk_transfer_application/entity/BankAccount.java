@@ -8,6 +8,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Data;
 
+/**
+ * BankAccount class represent 'bank_accounts' table in DB
+ */
 @Entity
 @Table(name = "bank_accounts")
 @Data

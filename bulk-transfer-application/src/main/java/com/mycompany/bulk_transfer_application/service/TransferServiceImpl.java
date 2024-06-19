@@ -14,6 +14,10 @@ import com.mycompany.bulk_transfer_application.pojo.Request;
 import com.mycompany.bulk_transfer_application.pojo.Response;
 import com.mycompany.bulk_transfer_application.pojo.Transfer;
 
+/**
+ * This is the service where all business logic is applied and
+ * it uses the TransferDAO class that interacts with the DB for CRUD operations 
+ */
 @Service
 public class TransferServiceImpl implements TransferService{
 	
@@ -26,6 +30,10 @@ public class TransferServiceImpl implements TransferService{
 		this.transferDAO = transferDAO;
 	}
 
+	/**
+	 * @param id represents id of the BankAccount in DB
+	 * @return the BankAccout balance in cents of euros
+	 */
 	@Override
 	public Integer getOrganizationBalance(int id) {
 		
@@ -41,7 +49,14 @@ public class TransferServiceImpl implements TransferService{
 		return null;
 	}
 	
-	
+	/**
+	 * This function implements business logic in which at first the BankAccount info
+	 * are retrieved from DB, using IBAN e BIC, then it checks if it's possible to handle
+	 * the request and in that case updates the DB.
+	 * 
+	 * @param request represents the request JSON 
+	 * @return Response which can be with code 1 for successful and -99 otherwise
+	 */
 	@Override
 	public Response insertTransfers(Request request) {
 		
@@ -50,12 +65,14 @@ public class TransferServiceImpl implements TransferService{
 		
 		logger.info("Getting bank account info from DB using BIC {} and IBAN {}", organizationBic, organizationIban);
 		
+		// Getting BankAccount info from DB using BIC and IBAN
 		BankAccount account = transferDAO.getBankAccountsByBicIban(organizationBic, organizationIban);
 		
 		logger.info("Bank Account information retrieved {}", account);
 		
 		List<Transfer> incomingTransfers = request.getCreditTransfers();
 		
+		// Calculates the total amount need to handle the bulk transfer
 		Integer totalAmountTransfer = calculateTotalAmount(incomingTransfers);
 		Integer accountBalance = Integer.parseInt(account.getBalanceCents());
 		
@@ -63,6 +80,8 @@ public class TransferServiceImpl implements TransferService{
 		
 		Response response = new Response();
 		
+		// If the organization has enough money the bulk transfer is handled
+		// otherwise -99 is returned as response
 		if(totalAmountTransfer > accountBalance)  {
 	
 			logger.info("Operation not allowed - CREDIT NOT SUFFICIENT");
@@ -73,6 +92,7 @@ public class TransferServiceImpl implements TransferService{
 			
 			logger.info("Operation allowed");
 			
+			// For each transfer in the bulk we add it to DB and update organization balance
 			for(Transfer transfer : incomingTransfers) {
 				
 				logger.info("Insert transfer {} in DB", transfer);
@@ -98,6 +118,12 @@ public class TransferServiceImpl implements TransferService{
 		
 	}
 
+	/**
+	 * Calculates the total amount need to process the bulk transfer
+	 * 
+	 * @param transfers a list with all the transfers
+	 * @return an integer with the total value of the bulk transfer
+	 */
 	private Integer calculateTotalAmount(List<Transfer> transfers) {
 		Integer total = 0;
 		for(Transfer transfer : transfers) {
@@ -107,6 +133,13 @@ public class TransferServiceImpl implements TransferService{
 		return total;
 	}
 	
+	/**
+	 * The function converts a String that represents a value in euros to
+	 * an Integer that represents the same value in cents of euros
+	 * 
+	 * @param euros String value in euros
+	 * @return integer value representing cents of euros of the input param
+	 */
 	private Integer getCentsOfEuros(String euros) {
 		String[] decimalSplit = euros.split("\\.");
 		Integer centsOfEuros = Integer.parseInt(decimalSplit[0]) * 100;
@@ -121,6 +154,15 @@ public class TransferServiceImpl implements TransferService{
 		return centsOfEuros;
 	}
 	
+	/**
+	 * Insert transfer in DB by combining the info of the request @param transfer
+	 * and the @param account ID
+	 *  
+	 * @param transfer one of the transfer received in the bulk request
+	 * @param account the account performing the request
+	 * 
+	 * @return the TransferEntity added in the DB table
+	 */
 	private TransferEntity createTransferEntity(Transfer transfer, BankAccount account) {
 		
 		TransferEntity transferEntity = new TransferEntity();

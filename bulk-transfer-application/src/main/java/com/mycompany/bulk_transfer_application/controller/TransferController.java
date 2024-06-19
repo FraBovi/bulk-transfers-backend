@@ -15,6 +15,9 @@ import com.mycompany.bulk_transfer_application.pojo.Request;
 import com.mycompany.bulk_transfer_application.pojo.Response;
 import com.mycompany.bulk_transfer_application.service.TransferService;
 
+/**
+ * TransferController handles all the request that have /api as prefix
+ */
 @RestController
 @RequestMapping("/api")
 public class TransferController {
@@ -28,11 +31,17 @@ public class TransferController {
 		this.transferService = transferService;
 	}
 	
+	/**
+	 * function that handle a POST for bulk transfers
+	 * @param transferRequest represents the body of the request
+	 * @return an entity with code 201 or 422 if the request can be processed
+	 */
 	@PostMapping(path = "/transfer", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> bulkTransfer(@RequestBody Request transferRequest) {
 		
 		logger.info("Request for /transfer arrived, with body {}", transferRequest);
 		
+		// call a service to handle the request
 		Response response = transferService.insertTransfers(transferRequest);
 		
 		logger.info("Sending response {}", response);

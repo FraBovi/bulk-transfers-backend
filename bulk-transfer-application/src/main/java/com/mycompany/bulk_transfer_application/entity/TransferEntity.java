@@ -10,6 +10,9 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 
+/**
+ * TransferEntity class represent 'transfers' table in DB
+ */
 @Entity
 @Table(name = "transfers")
 @Data

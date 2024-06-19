@@ -7,6 +7,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+/**
+ * Request is the class that represents the request JSON
+ */
 @Data
 @AllArgsConstructor
 public class Request {

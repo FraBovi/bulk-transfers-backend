@@ -13,21 +13,29 @@ import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
 
+/**
+ * Repository class in which all the DB operation are performed
+ */
 @Repository
 public class TransferDAOImpl implements TransferDAO {
 	
 	private static final Logger logger = LoggerFactory.getLogger(TransferDAOImpl.class);
 	
-	public EntityManager entityManager;
+	private EntityManager entityManager;
 	
 	@Autowired
 	public TransferDAOImpl(EntityManager entityManager) {
 		this.entityManager = entityManager;
 	}
 
+	/**
+	 * Returns BankAccount DB information using @param id
+	 * 
+	 * @param id integer representing the account identifier
+	 * @return BankAccount class with DB info
+	 */
 	@Override
 	public BankAccount getBankAccountsById(int id) {
-		
 		
 		// get organization information
 		BankAccount organizationAccount = entityManager.find(BankAccount.class, id);
@@ -36,12 +44,27 @@ public class TransferDAOImpl implements TransferDAO {
 		return organizationAccount;
 	}
 
+	
+	/**
+	 * Update account information on DB using with the @param account
+	 * 
+	 * @param account with updated information
+	 * @return updated BankAccount
+	 */
 	@Override
 	@Transactional
 	public BankAccount updateBankAccount(BankAccount account) {
 		return entityManager.merge(account);
 	}
 
+	/**
+	 * Returns BankAccount DB information using @param orgBic and
+	 * @param orgIban
+	 * 
+	 * @param orgBic organization bic value
+	 * @param orgIban organization iban value
+	 * @return BankAccount class with DB info
+	 */
 	@Override
 	public BankAccount getBankAccountsByBicIban(String orgBic, String orgIban) {
 		
@@ -60,6 +83,11 @@ public class TransferDAOImpl implements TransferDAO {
 	    return account;
 	}
 
+	/**
+	 * Create a new transfer in the DB table
+	 * 
+	 * @param transfer is the new entity to insert in DB
+	 */
 	@Override
 	@Transactional
 	public void insertTransfers(TransferEntity transfer) {
