@@ -176,4 +176,11 @@ public class TransferServiceImpl implements TransferService{
 		
 		return transferEntity;
 	}
+
+	@Override
+	public BankAccount getBankAccountByBicIban(String bic, String iban) {
+		
+		return transferDAO.getBankAccountsByBicIban(bic, iban);
+		
+	}
 }
