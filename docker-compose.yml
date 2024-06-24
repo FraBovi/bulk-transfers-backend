@@ -6,12 +6,19 @@ services:
     ports:
       - 3307:3306
     networks:
-      - springapimysql-net  
+      - springapimysql-net
     environment:
       MYSQL_DATABASE: bulk
       MYSQL_USER: bulk
       MYSQL_PASSWORD: bulk
       MYSQL_ROOT_PASSWORD: root
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
   api_service:
     build: .
     restart: always
@@ -20,10 +27,10 @@ services:
     networks:
       - springapimysql-net
     environment:
-      - spring.datasource.url=jdbc:mysql://mysqldb:3306/bulk   
+      - spring.datasource.url=jdbc:mysql://mysqldb:3306/bulk
     depends_on:
-      - mysqldb
-    
+      mysqldb:
+        condition: service_healthy
     volumes:
       - .m2:/root/.m2
 
