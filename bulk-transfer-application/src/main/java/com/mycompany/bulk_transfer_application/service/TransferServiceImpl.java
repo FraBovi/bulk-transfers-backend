@@ -1,3 +1,4 @@
+// FIXME: the suffix "impl" looks weird to me. Not sure if Java wants it. The same applies for the class name.
 package com.mycompany.bulk_transfer_application.service;
 
 import java.util.List;
@@ -35,6 +36,7 @@ public class TransferServiceImpl implements TransferService{
 	 * @return the BankAccout balance in cents of euros
 	 */
 	@Override
+	// [Q]: is this function used somewhere?
 	public Integer getOrganizationBalance(int id) {
 		
 		logger.info("Getting bank account info from DB with ID {}", id);
@@ -89,7 +91,7 @@ public class TransferServiceImpl implements TransferService{
 			response.setDescription("Credit not sufficient");
 		
 		} else {
-			
+			// FIXME: "else" branches are never a good option. If you stumb across a blocker, immediately return. 
 			logger.info("Operation allowed");
 			
 			// For each transfer in the bulk we add it to DB and update organization balance
@@ -126,6 +128,7 @@ public class TransferServiceImpl implements TransferService{
 	 */
 	private Integer calculateTotalAmount(List<Transfer> transfers) {
 		Integer total = 0;
+		// [x]: maybe there's a better way of sum up the values in a list. Something like LINQ in C#.
 		for(Transfer transfer : transfers) {
 			total += getCentsOfEuros(transfer.getAmount());
 		}
@@ -140,11 +143,14 @@ public class TransferServiceImpl implements TransferService{
 	 * @param euros String value in euros
 	 * @return integer value representing cents of euros of the input param
 	 */
+	// FIXME: this could be moved somewhere else in a "utils" class and file.
 	private Integer getCentsOfEuros(String euros) {
 		String[] decimalSplit = euros.split("\\.");
 		Integer centsOfEuros = Integer.parseInt(decimalSplit[0]) * 100;
 		if(decimalSplit.length > 1) {
 			String cents = decimalSplit[1];
+			// TODO: probably you can convert those values to floating point numbers and multiply by 100.
+			// even if it works, let's write it in a cleaner way.
 			if(cents.length() == 2) centsOfEuros += Integer.parseInt(cents);
 			else {
 				centsOfEuros += Integer.parseInt(cents.concat("0"));
@@ -163,6 +169,7 @@ public class TransferServiceImpl implements TransferService{
 	 * 
 	 * @return the TransferEntity added in the DB table
 	 */
+	// FIXME: this could be moved to a sort of "mapping" layer to declutter the code here.
 	private TransferEntity createTransferEntity(Transfer transfer, BankAccount account) {
 		
 		TransferEntity transferEntity = new TransferEntity();
@@ -178,6 +185,7 @@ public class TransferServiceImpl implements TransferService{
 	}
 
 	@Override
+	// [Q]: this could be skipped by invoking directly the DAO?
 	public BankAccount getBankAccountByBicIban(String bic, String iban) {
 		
 		return transferDAO.getBankAccountsByBicIban(bic, iban);

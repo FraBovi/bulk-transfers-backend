@@ -7,7 +7,7 @@ import lombok.Data;
  */
 @Data
 public class Response {
-	
+	// [Q]: what does "code" mean?
 	private int code;
 	private String description;
 
