@@ -36,7 +36,7 @@ public class TransferDAOImpl implements TransferDAO {
 	 */
 	@Override
     // [Q]: is this function used somewhere else?
-	public BankAccount getBankAccountsById(int id) {
+	public BankAccount findBankAccountById(int id) {
 		
 		// get organization information
 		BankAccount organizationAccount = entityManager.find(BankAccount.class, id);
@@ -68,7 +68,7 @@ public class TransferDAOImpl implements TransferDAO {
 	 */
 	@Override
     // [x]: you used plural noun but you return single result. Rename it to "searchBankAccount" since you should handle also the name?
-	public BankAccount getBankAccountsByBicIban(String orgBic, String orgIban) {
+	public BankAccount findBankAccountByBicIban(String orgBic, String orgIban) {
 		
 		String sqlQuery = "from BankAccount where iban = :iban AND bic = :bic";
 		TypedQuery<BankAccount> query = entityManager.createQuery(sqlQuery, BankAccount.class);

@@ -8,6 +8,6 @@ public interface TransferService {
 	
 	public Integer getOrganizationBalance(int id);
 	public Response insertTransfers(Request request);
-	public BankAccount getBankAccountByBicIban(String bic, String iban);
+	public BankAccount findBankAccountByBicIban(String bic, String iban);
 
 }

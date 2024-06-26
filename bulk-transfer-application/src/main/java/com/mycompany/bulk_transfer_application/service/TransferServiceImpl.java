@@ -41,7 +41,7 @@ public class TransferServiceImpl implements TransferService{
 		
 		logger.info("Getting bank account info from DB with ID {}", id);
 		
-		BankAccount dbOrganizationAccount = transferDAO.getBankAccountsById(id);
+		BankAccount dbOrganizationAccount = transferDAO.findBankAccountById(id);
 		
 		logger.info("Bank Account information retrieved {}", dbOrganizationAccount);
 		
@@ -68,7 +68,7 @@ public class TransferServiceImpl implements TransferService{
 		logger.info("Getting bank account info from DB using BIC {} and IBAN {}", organizationBic, organizationIban);
 		
 		// Getting BankAccount info from DB using BIC and IBAN
-		BankAccount account = transferDAO.getBankAccountsByBicIban(organizationBic, organizationIban);
+		BankAccount account = transferDAO.findBankAccountByBicIban(organizationBic, organizationIban);
 		
 		logger.info("Bank Account information retrieved {}", account);
 		
@@ -82,39 +82,41 @@ public class TransferServiceImpl implements TransferService{
 		
 		Response response = new Response();
 		
-		// If the organization has enough money the bulk transfer is handled
-		// otherwise -99 is returned as response
+		// If the organization has not enough money the bulk transfer is not allowed
+		// -99 is returned as response
 		if(totalAmountTransfer > accountBalance)  {
 	
 			logger.info("Operation not allowed - CREDIT NOT SUFFICIENT");
 			response.setCode(-99);
 			response.setDescription("Credit not sufficient");
+
+			return response;
 		
-		} else {
-			// FIXME: "else" branches are never a good option. If you stumb across a blocker, immediately return. 
-			logger.info("Operation allowed");
-			
-			// For each transfer in the bulk we add it to DB and update organization balance
-			for(Transfer transfer : incomingTransfers) {
-				
-				logger.info("Insert transfer {} in DB", transfer);
-				
-				TransferEntity transferEntity = createTransferEntity(transfer, account);
-				transferDAO.insertTransfers(transferEntity);
-				
-				accountBalance -= transferEntity.getAmountCents();
-				account.setBalanceCents(accountBalance.toString());
-				
-				logger.info("Update bank account {} in DB", account);
-				
-				transferDAO.updateBankAccount(account);
-				
-				response.setCode(1);
-				response.setDescription("Transfers done successfully");
-			
-			}
-			
 		}
+
+		// FIXME: "else" branches are never a good option. If you stumb across a blocker, immediately return. 
+		logger.info("Operation allowed");
+		
+		// For each transfer in the bulk we add it to DB and update organization balance
+		for(Transfer transfer : incomingTransfers) {
+			
+			logger.info("Insert transfer {} in DB", transfer);
+			
+			TransferEntity transferEntity = createTransferEntity(transfer, account);
+			transferDAO.insertTransfers(transferEntity);
+			
+			accountBalance -= transferEntity.getAmountCents();
+			account.setBalanceCents(accountBalance.toString());
+			
+			logger.info("Update bank account {} in DB", account);
+			
+			transferDAO.updateBankAccount(account);
+			
+			response.setCode(1);
+			response.setDescription("Transfers done successfully");
+		
+		}
+			
 		
 		return response;
 		
@@ -129,6 +131,12 @@ public class TransferServiceImpl implements TransferService{
 	private Integer calculateTotalAmount(List<Transfer> transfers) {
 		Integer total = 0;
 		// [x]: maybe there's a better way of sum up the values in a list. Something like LINQ in C#.
+		/*
+		 * A different way could be using stream:
+		 * 	total = transfers.stream()
+    		.mapToInt(transfer -> getCentsOfEuros(transfer.getAmount()))
+    		.sum();
+		 */
 		for(Transfer transfer : transfers) {
 			total += getCentsOfEuros(transfer.getAmount());
 		}
@@ -186,9 +194,9 @@ public class TransferServiceImpl implements TransferService{
 
 	@Override
 	// [Q]: this could be skipped by invoking directly the DAO?
-	public BankAccount getBankAccountByBicIban(String bic, String iban) {
+	public BankAccount findBankAccountByBicIban(String bic, String iban) {
 		
-		return transferDAO.getBankAccountsByBicIban(bic, iban);
+		return transferDAO.findBankAccountByBicIban(bic, iban);
 		
 	}
 }
