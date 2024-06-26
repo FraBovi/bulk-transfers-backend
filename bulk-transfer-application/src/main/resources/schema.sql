@@ -1,3 +1,4 @@
+// FIXME: fix the issue here since it seems that it keeps restarting the web server container.
 GRANT ALL PRIVILEGES ON *.* TO 'bulk'@'%' IDENTIFIED BY 'bulk' WITH GRANT OPTION;
 FLUSH PRIVILEGES;
 

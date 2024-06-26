@@ -35,6 +35,7 @@ public class TransferDAOImpl implements TransferDAO {
 	 * @return BankAccount class with DB info
 	 */
 	@Override
+    // [Q]: is this function used somewhere else?
 	public BankAccount getBankAccountsById(int id) {
 		
 		// get organization information
@@ -66,6 +67,7 @@ public class TransferDAOImpl implements TransferDAO {
 	 * @return BankAccount class with DB info
 	 */
 	@Override
+    // [x]: you used plural noun but you return single result. Rename it to "searchBankAccount" since you should handle also the name?
 	public BankAccount getBankAccountsByBicIban(String orgBic, String orgIban) {
 		
 		String sqlQuery = "from BankAccount where iban = :iban AND bic = :bic";
@@ -75,6 +77,7 @@ public class TransferDAOImpl implements TransferDAO {
 		
 		BankAccount account = null;
 	    try {
+            // BUG: the account might not exist. Why are you throwing up an exception?
 	        account = query.getSingleResult();
 	    } catch (NoResultException e) {
 	        logger.error("Unexpected exception ", e);
