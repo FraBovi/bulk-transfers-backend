@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-BulkTransferApplication<bulk-transfer-application>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.mycompany.bulk_transfer_application.BulkTransferApplication",
+            "projectName": "bulk-transfer-application",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

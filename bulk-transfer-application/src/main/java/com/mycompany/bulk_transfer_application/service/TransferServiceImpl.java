@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.mycompany.bulk_transfer_application.BulkUtils;
 import com.mycompany.bulk_transfer_application.dao.TransferDAO;
 import com.mycompany.bulk_transfer_application.entity.BankAccount;
 import com.mycompany.bulk_transfer_application.entity.TransferEntity;
@@ -138,34 +139,10 @@ public class TransferServiceImpl implements TransferService{
     		.sum();
 		 */
 		for(Transfer transfer : transfers) {
-			total += getCentsOfEuros(transfer.getAmount());
+			total += BulkUtils.getCentsOfEuros(transfer.getAmount());
 		}
 		
 		return total;
-	}
-	
-	/**
-	 * The function converts a String that represents a value in euros to
-	 * an Integer that represents the same value in cents of euros
-	 * 
-	 * @param euros String value in euros
-	 * @return integer value representing cents of euros of the input param
-	 */
-	// FIXME: this could be moved somewhere else in a "utils" class and file.
-	private Integer getCentsOfEuros(String euros) {
-		String[] decimalSplit = euros.split("\\.");
-		Integer centsOfEuros = Integer.parseInt(decimalSplit[0]) * 100;
-		if(decimalSplit.length > 1) {
-			String cents = decimalSplit[1];
-			// TODO: probably you can convert those values to floating point numbers and multiply by 100.
-			// even if it works, let's write it in a cleaner way.
-			if(cents.length() == 2) centsOfEuros += Integer.parseInt(cents);
-			else {
-				centsOfEuros += Integer.parseInt(cents.concat("0"));
-			}
-		}
-		
-		return centsOfEuros;
 	}
 	
 	/**
@@ -187,7 +164,7 @@ public class TransferServiceImpl implements TransferService{
 		transferEntity.setCounterpartyBic(transfer.getCounterpartyBic());
 		transferEntity.setDescription(transfer.getDescription());
 		transferEntity.setCounterpartyIban(transfer.getCounterpartyIban());
-		transferEntity.setAmountCents(getCentsOfEuros(transfer.getAmount()));
+		transferEntity.setAmountCents(BulkUtils.getCentsOfEuros(transfer.getAmount()));
 		
 		return transferEntity;
 	}
