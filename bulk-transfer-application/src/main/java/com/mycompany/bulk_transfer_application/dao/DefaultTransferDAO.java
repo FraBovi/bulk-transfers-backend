@@ -9,7 +9,6 @@ import com.mycompany.bulk_transfer_application.entity.BankAccount;
 import com.mycompany.bulk_transfer_application.entity.TransferEntity;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
 
@@ -17,14 +16,12 @@ import jakarta.transaction.Transactional;
  * Repository class in which all the DB operation are performed
  */
 @Repository
-public class TransferDAOImpl implements TransferDAO {
-	
-	private static final Logger logger = LoggerFactory.getLogger(TransferDAOImpl.class);
+public class DefaultTransferDAO implements TransferDAO {
 	
 	private EntityManager entityManager;
 	
 	@Autowired
-	public TransferDAOImpl(EntityManager entityManager) {
+	public DefaultTransferDAO(EntityManager entityManager) {
 		this.entityManager = entityManager;
 	}
 
@@ -68,7 +65,7 @@ public class TransferDAOImpl implements TransferDAO {
 	 */
 	@Override
     // [x]: you used plural noun but you return single result. Rename it to "searchBankAccount" since you should handle also the name?
-	public BankAccount findBankAccountByBicIban(String orgBic, String orgIban) {
+	public BankAccount getBankAccountByBicAndIban(String orgBic, String orgIban) {
 		
 		String sqlQuery = "from BankAccount where iban = :iban AND bic = :bic";
 		TypedQuery<BankAccount> query = entityManager.createQuery(sqlQuery, BankAccount.class);
@@ -76,12 +73,8 @@ public class TransferDAOImpl implements TransferDAO {
 		query.setParameter("bic", orgBic);
 		
 		BankAccount account = null;
-	    try {
-            // BUG: the account might not exist. Why are you throwing up an exception?
-	        account = query.getSingleResult();
-	    } catch (NoResultException e) {
-	        logger.error("Unexpected exception ", e);
-	    }
+        // BUG: the account might not exist. Why are you throwing up an exception?
+	    account = query.getSingleResult();
 	    
 	    return account;
 	}

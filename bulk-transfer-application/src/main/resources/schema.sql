@@ -1,8 +1,4 @@
 -- FIXME: fix the issue here since it seems that it keeps restarting the web server container.
-CREATE USER IF NOT EXISTS 'bulkUser'@'%' IDENTIFIED BY 'bulk';
-GRANT ALL PRIVILEGES ON *.* TO 'bulkUser'@'%';
-FLUSH PRIVILEGES;
-
 DROP TABLE IF EXISTS transfers;
 DROP TABLE IF EXISTS bank_accounts;
 

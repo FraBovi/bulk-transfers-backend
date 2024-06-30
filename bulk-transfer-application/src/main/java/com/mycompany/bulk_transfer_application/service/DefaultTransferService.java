@@ -21,14 +21,14 @@ import com.mycompany.bulk_transfer_application.pojo.Transfer;
  * it uses the TransferDAO class that interacts with the DB for CRUD operations 
  */
 @Service
-public class TransferServiceImpl implements TransferService{
+public class DefaultTransferService implements TransferService {
 	
-	private static final Logger logger = LoggerFactory.getLogger(TransferServiceImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(DefaultTransferService.class);
 	
 	private TransferDAO transferDAO;
 	
 	@Autowired
-	public TransferServiceImpl(TransferDAO transferDAO) {
+	public DefaultTransferService(TransferDAO transferDAO) {
 		this.transferDAO = transferDAO;
 	}
 
@@ -69,7 +69,7 @@ public class TransferServiceImpl implements TransferService{
 		logger.info("Getting bank account info from DB using BIC {} and IBAN {}", organizationBic, organizationIban);
 		
 		// Getting BankAccount info from DB using BIC and IBAN
-		BankAccount account = transferDAO.findBankAccountByBicIban(organizationBic, organizationIban);
+		BankAccount account = transferDAO.getBankAccountByBicAndIban(organizationBic, organizationIban);
 		
 		logger.info("Bank Account information retrieved {}", account);
 		
@@ -130,19 +130,8 @@ public class TransferServiceImpl implements TransferService{
 	 * @return an integer with the total value of the bulk transfer
 	 */
 	private Integer calculateTotalAmount(List<Transfer> transfers) {
-		Integer total = 0;
 		// [x]: maybe there's a better way of sum up the values in a list. Something like LINQ in C#.
-		/*
-		 * A different way could be using stream:
-		 * 	total = transfers.stream()
-    		.mapToInt(transfer -> getCentsOfEuros(transfer.getAmount()))
-    		.sum();
-		 */
-		for(Transfer transfer : transfers) {
-			total += BulkUtils.getCentsOfEuros(transfer.getAmount());
-		}
-		
-		return total;
+		return transfers.stream().mapToInt(transfer -> BulkUtils.getCentsOfEuros(transfer.getAmount())).sum();
 	}
 	
 	/**
@@ -173,7 +162,7 @@ public class TransferServiceImpl implements TransferService{
 	// [Q]: this could be skipped by invoking directly the DAO?
 	public BankAccount findBankAccountByBicIban(String bic, String iban) {
 		
-		return transferDAO.findBankAccountByBicIban(bic, iban);
+		return transferDAO.getBankAccountByBicAndIban(bic, iban);
 		
 	}
 }
