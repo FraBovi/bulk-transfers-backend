@@ -1,4 +1,7 @@
 -- FIXME: fix the issue here since it seems that it keeps restarting the web server container.
+CREATE DATABASE IF NOT EXISTS transfers_db;
+USE transfers_db;
+
 DROP TABLE IF EXISTS transfers;
 DROP TABLE IF EXISTS bank_accounts;
 

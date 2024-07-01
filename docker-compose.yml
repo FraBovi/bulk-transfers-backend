@@ -2,6 +2,7 @@
 services:
   mysqldb:
     image: "mysql:8.0"
+    container_name: mysqldb
     restart: always
     ports:
       - 3307:3306
@@ -9,8 +10,8 @@ services:
       - springapimysql-net
     environment:
 # FIXME: use meaningful name when possible. "bulk" as db name is ugly.
-      MYSQL_DATABASE: customers_transfers
-      MYSQL_USER: root
+      MYSQL_DATABASE: transfers_db
+      MYSQL_USER: bulk_user
       MYSQL_PASSWORD: root
       MYSQL_ROOT_PASSWORD: root
     healthcheck:
@@ -22,6 +23,7 @@ services:
 
   api_service:
     build: .
+    container_name: springbootapp
     restart: always
     ports:
       - 8080:8080
@@ -29,6 +31,8 @@ services:
       - springapimysql-net
     environment:
       - spring.datasource.url=jdbc:mysql://mysqldb:3306/transfers_db
+      - spring.datasource.username=bulk_user
+      - spring.datasource.password=root
     depends_on:
       mysqldb:
         condition: service_healthy
