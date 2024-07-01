@@ -17,8 +17,9 @@
 
 2. Test the application (use JSON files in __/request-body__ as body of the requests):
 
-    First of all is important to check the current balance of the unique organization in the DB (present by default). In order to get the account information perform a GET request to [localhost:8080/api/account](http://localhost:8080/api/account) with body the JSON in __account.json__ file. 
+    First of all is important to check the current balance of the unique organization in the DB (present by default). In order to get the account information perform a GET request to [localhost:8080/api/account](http://localhost:8080/api/accounts) with parameters in query string IBAN and BIC fo the organization (those information can be found in __sample1.json__ or __sample2.json__ files). The final URI will be:
+    [localhost:8080/api/accounts?organizationIban=IT10474608000005006107XXXXX&organizationBic=OIVUSCLQXXX](http://localhost:8080/api/accounts?organizationIban=IT10474608000005006107XXXXX&organizationBic=OIVUSCLQXXX)  
 
-    Then using __sample1.json__ or __sample2.json__ as body of a POST request to [localhost:8080/api/transfer](http://localhost:8080/api/transfer) is it possible to test the application, trying to perform bulk transfers from the organization to others. 
+    Then using __sample1.json__ or __sample2.json__ as body of a POST request to [localhost:8080/api/customer/transfers](http://localhost:8080/api/customer/transfers) is it possible to test the application, trying to perform bulk transfers from the organization to others. 
     
     For __sample1.json__ it would execute successfully (updating the DB, in fact performing now a second GET we can see how the organization baance is updated), whil using __sample2.json__ will have always a negative outcome (credit not sufficient).
