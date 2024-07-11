@@ -32,7 +32,7 @@ public class DefaultTransferDAO implements TransferDAO {
 	 * @return BankAccount class with DB info
 	 */
 	@Override
-    // [Q]: is this function used somewhere else?
+    // TODO: is this function used somewhere else?
 	public BankAccount findBankAccountById(int id) {
 		
 		// get organization information
@@ -64,7 +64,6 @@ public class DefaultTransferDAO implements TransferDAO {
 	 * @return BankAccount class with DB info
 	 */
 	@Override
-    // [x]: you used plural noun but you return single result. Rename it to "searchBankAccount" since you should handle also the name?
 	public BankAccount getBankAccountByBicAndIban(String orgBic, String orgIban) {
 		
 		String sqlQuery = "from BankAccount where iban = :iban AND bic = :bic";

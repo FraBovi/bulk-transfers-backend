@@ -9,13 +9,12 @@ public class BulkUtils {
 	 * @param euros String value in euros
 	 * @return integer value representing cents of euros of the input param
 	 */
-	// FIXME: this could be moved somewhere else in a "utils" class and file.
 	public static Integer getCentsOfEuros(String euros) {
-        // TODO: probably you can convert those values to floating point numbers and multiply by 100.
-        // even if it works, let's write it in a cleaner way.
+        // TODO: if a pass in a string like "abc"?
+        // How will the exception be managed? If any is fired...
+        // Write unit tests for this function.
 		Float centsOfEuros = Float.parseFloat(euros) * 100;
 		
 		return centsOfEuros.intValue();
 	}
-    
 }

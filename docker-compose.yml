@@ -1,4 +1,3 @@
-# FIXME: this version is obsolete. Stick to the latest one.
 services:
   mysqldb:
     image: "mysql:8.0"
@@ -9,7 +8,6 @@ services:
     networks:
       - springapimysql-net
     environment:
-# FIXME: use meaningful name when possible. "bulk" as db name is ugly.
       MYSQL_DATABASE: transfers_db
       MYSQL_USER: bulk_user
       MYSQL_PASSWORD: root
