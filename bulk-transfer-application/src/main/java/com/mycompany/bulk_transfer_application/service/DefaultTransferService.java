@@ -1,4 +1,3 @@
-// FIXME: the suffix "impl" looks weird to me. Not sure if Java wants it. The same applies for the class name.
 package com.mycompany.bulk_transfer_application.service;
 
 import java.util.List;
@@ -21,6 +20,7 @@ import com.mycompany.bulk_transfer_application.pojo.Transfer;
  * it uses the TransferDAO class that interacts with the DB for CRUD operations 
  */
 @Service
+// TODO: why "Default" prefix? Only to differentiate it from the interface name? Why not prepending the latter with the prefix "I" or leave it as it is if the compiler doesn't complain.
 public class DefaultTransferService implements TransferService {
 	
 	private static final Logger logger = LoggerFactory.getLogger(DefaultTransferService.class);
@@ -37,7 +37,7 @@ public class DefaultTransferService implements TransferService {
 	 * @return the BankAccout balance in cents of euros
 	 */
 	@Override
-	// [Q]: is this function used somewhere?
+	// TODO: is this function used somewhere?
 	public Integer getOrganizationBalance(int id) {
 		
 		logger.info("Getting bank account info from DB with ID {}", id);
@@ -95,7 +95,6 @@ public class DefaultTransferService implements TransferService {
 		
 		}
 
-		// FIXME: "else" branches are never a good option. If you stumb across a blocker, immediately return. 
 		logger.info("Operation allowed");
 		
 		// For each transfer in the bulk we add it to DB and update organization balance
@@ -130,7 +129,6 @@ public class DefaultTransferService implements TransferService {
 	 * @return an integer with the total value of the bulk transfer
 	 */
 	private Integer calculateTotalAmount(List<Transfer> transfers) {
-		// [x]: maybe there's a better way of sum up the values in a list. Something like LINQ in C#.
 		return transfers.stream().mapToInt(transfer -> BulkUtils.getCentsOfEuros(transfer.getAmount())).sum();
 	}
 	
@@ -143,7 +141,6 @@ public class DefaultTransferService implements TransferService {
 	 * 
 	 * @return the TransferEntity added in the DB table
 	 */
-	// FIXME: this could be moved to a sort of "mapping" layer to declutter the code here.
 	private TransferEntity createTransferEntity(Transfer transfer, BankAccount account) {
 		
 		TransferEntity transferEntity = new TransferEntity();
@@ -159,7 +156,7 @@ public class DefaultTransferService implements TransferService {
 	}
 
 	@Override
-	// [Q]: this could be skipped by invoking directly the DAO?
+	// TODO: this could be skipped by invoking directly the DAO?
 	public BankAccount findBankAccountByBicIban(String bic, String iban) {
 		
 		return transferDAO.getBankAccountByBicAndIban(bic, iban);

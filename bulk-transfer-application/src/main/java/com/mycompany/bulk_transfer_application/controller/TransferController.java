@@ -40,7 +40,6 @@ public class TransferController {
 	 * @param transferRequest represents the body of the request
 	 * @return an entity with code 201 or 422 if the request can be processed
 	 */
-    // FIXME: the path should be something like "/customer/transfers"
 	@PostMapping(path = "/customer/transfers", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> bulkTransfer(@RequestBody Request transferRequest) {
 		
@@ -55,7 +54,6 @@ public class TransferController {
 		return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(response);
 	}
 	
-    // FIXME: this wasn't required from the assignment. If you want to implement it stick to the search pattern by using query string params (e.g. "/accounts?organizationName=aaaaa&organizationBic=hhh")
     // TODO: use also the organizationName to lookup the record (handle it in the lower levels)
 	@GetMapping(path = "/accounts", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getBankAccountByBicAndIban(@RequestParam String organizationIban, @RequestParam String organizationBic) throws BadRequestException {

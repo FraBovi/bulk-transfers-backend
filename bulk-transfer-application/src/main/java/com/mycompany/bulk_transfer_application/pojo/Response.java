@@ -1,3 +1,4 @@
+// TODO: "pojo" stands for?
 package com.mycompany.bulk_transfer_application.pojo;
 
 import lombok.Data;
@@ -7,7 +8,7 @@ import lombok.Data;
  */
 @Data
 public class Response {
-	// [Q]: what does "code" mean?
+	// TODO: what does "code" mean?
 	private int code;
 	private String description;
 
