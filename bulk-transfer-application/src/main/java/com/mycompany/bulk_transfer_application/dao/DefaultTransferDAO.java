@@ -1,7 +1,7 @@
 package com.mycompany.bulk_transfer_application.dao;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -24,24 +24,6 @@ public class DefaultTransferDAO implements TransferDAO {
 	public DefaultTransferDAO(EntityManager entityManager) {
 		this.entityManager = entityManager;
 	}
-
-	/**
-	 * Returns BankAccount DB information using @param id
-	 * 
-	 * @param id integer representing the account identifier
-	 * @return BankAccount class with DB info
-	 */
-	@Override
-    // TODO: is this function used somewhere else?
-	public BankAccount findBankAccountById(int id) {
-		
-		// get organization information
-		BankAccount organizationAccount = entityManager.find(BankAccount.class, id);
-		
-		// return the db information
-		return organizationAccount;
-	}
-
 	
 	/**
 	 * Update account information on DB using with the @param account
@@ -89,6 +71,46 @@ public class DefaultTransferDAO implements TransferDAO {
 		
 		entityManager.persist(transfer);
 	
+	}
+
+	@Override
+	public List<BankAccount> searchBankAccountsByBic(String orgBic) {
+		
+		String sqlQuery = "from BankAccount where bic = :bic";
+		TypedQuery<BankAccount> query = entityManager.createQuery(sqlQuery, BankAccount.class);
+		query.setParameter("bic", orgBic);
+		
+		List<BankAccount> accounts = null;
+	    accounts = query.getResultList();
+	    
+	    return accounts;
+	}
+
+	@Override
+	public List<BankAccount> searchBankAccountsByIban(String orgIban) {
+
+		String sqlQuery = "from BankAccount where iban = :iban";
+		TypedQuery<BankAccount> query = entityManager.createQuery(sqlQuery, BankAccount.class);
+		query.setParameter("iban", orgIban);
+		
+		List<BankAccount> accounts = null;
+	    accounts = query.getResultList();
+	    
+	    return accounts;
+
+	}
+
+	@Override
+	public List<BankAccount> findAllBankAccounts() {
+
+		String sqlQuery = "from BankAccount";
+		TypedQuery<BankAccount> query = entityManager.createQuery(sqlQuery, BankAccount.class);
+		
+		List<BankAccount> accounts = null;
+	    accounts = query.getResultList();
+	    
+	    return accounts;
+
 	}
 
 }

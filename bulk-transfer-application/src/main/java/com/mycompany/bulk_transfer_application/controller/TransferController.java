@@ -59,8 +59,6 @@ public class TransferController {
 	public ResponseEntity<?> getBankAccountByBicAndIban(@RequestParam String organizationIban, @RequestParam String organizationBic) throws BadRequestException {
 		
 		logger.info("Request for /accounts arrived, with params IBAN {} and BIC {}", organizationIban, organizationBic);
-
-		if(organizationIban.isEmpty() || organizationBic.isEmpty()) throw new BadRequestException("Bad Request");
 		
 		// call a service to handle the request
 		BankAccount account = transferService.findBankAccountByBicIban(organizationBic, organizationIban);

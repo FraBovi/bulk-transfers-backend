@@ -21,6 +21,7 @@ import com.mycompany.bulk_transfer_application.pojo.Transfer;
  */
 @Service
 // TODO: why "Default" prefix? Only to differentiate it from the interface name? Why not prepending the latter with the prefix "I" or leave it as it is if the compiler doesn't complain.
+// My fist idea was to use the prefix "I" as you suggest, but after reading this https://stackoverflow.com/questions/2814805/java-interfaces-implementation-naming-convention/2815440 I change my mind. 
 public class DefaultTransferService implements TransferService {
 	
 	private static final Logger logger = LoggerFactory.getLogger(DefaultTransferService.class);
@@ -30,26 +31,6 @@ public class DefaultTransferService implements TransferService {
 	@Autowired
 	public DefaultTransferService(TransferDAO transferDAO) {
 		this.transferDAO = transferDAO;
-	}
-
-	/**
-	 * @param id represents id of the BankAccount in DB
-	 * @return the BankAccout balance in cents of euros
-	 */
-	@Override
-	// TODO: is this function used somewhere?
-	public Integer getOrganizationBalance(int id) {
-		
-		logger.info("Getting bank account info from DB with ID {}", id);
-		
-		BankAccount dbOrganizationAccount = transferDAO.findBankAccountById(id);
-		
-		logger.info("Bank Account information retrieved {}", dbOrganizationAccount);
-		
-		if(dbOrganizationAccount != null) {
-			return Integer.parseInt(dbOrganizationAccount.getBalanceCents());
-		}
-		return null;
 	}
 	
 	/**
@@ -157,9 +138,15 @@ public class DefaultTransferService implements TransferService {
 
 	@Override
 	// TODO: this could be skipped by invoking directly the DAO?
-	public BankAccount findBankAccountByBicIban(String bic, String iban) {
+	// Yes , idk if calling the DAO directly by the Controller would be better than this boilerplate code
+	// however this can be removed if you think.
+	public List<BankAccount> findBankAccountByBicIban(String bic, String iban) {
 		
-		return transferDAO.getBankAccountByBicAndIban(bic, iban);
+		if(iban != null && bic != null) return transferDAO.getBankAccountByBicAndIban(bic, iban);
+		if(iban != null) return transferDAO.searchBankAccountsByIban(iban);
+		if(bic != null) return transferDAO.searchBankAccountsByBic(bic);
+
+		return transferDAO.findAllBankAccounts();
 		
 	}
 }

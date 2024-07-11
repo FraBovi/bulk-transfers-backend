@@ -6,7 +6,6 @@ import com.mycompany.bulk_transfer_application.pojo.Response;
 
 public interface TransferService {
 
-    public Integer getOrganizationBalance(int id);
     public Response insertTransfers(Request request);
     public BankAccount findBankAccountByBicIban(String bic, String iban);
     

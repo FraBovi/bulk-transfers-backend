@@ -1,6 +1,11 @@
 package com.mycompany.bulk_transfer_application;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class BulkUtils {
+
+	private static final Logger logger = LoggerFactory.getLogger(BulkUtils.class);
 
     /**
 	 * The function converts a String that represents a value in euros to
@@ -13,8 +18,14 @@ public class BulkUtils {
         // TODO: if a pass in a string like "abc"?
         // How will the exception be managed? If any is fired...
         // Write unit tests for this function.
-		Float centsOfEuros = Float.parseFloat(euros) * 100;
-		
+		Float centsOfEuros = 0f;
+		try {
+			centsOfEuros = Float.parseFloat(euros) * 100;
+		} catch (NumberFormatException e) {
+			logger.error("NumberFormatException : ", e);
+		}
+
 		return centsOfEuros.intValue();
+		
 	}
 }
