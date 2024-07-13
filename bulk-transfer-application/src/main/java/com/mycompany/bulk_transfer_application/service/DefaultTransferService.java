@@ -69,7 +69,7 @@ public class DefaultTransferService implements TransferService {
 		if(totalAmountTransfer > accountBalance)  {
 	
 			logger.info("Operation not allowed - CREDIT NOT SUFFICIENT");
-			response.setCode(-99);
+			response.setCode(422);
 			response.setDescription("Credit not sufficient");
 
 			return response;
@@ -93,7 +93,7 @@ public class DefaultTransferService implements TransferService {
 			
 			transferDAO.updateBankAccount(account);
 			
-			response.setCode(1);
+			response.setCode(200);
 			response.setDescription("Transfers done successfully");
 		
 		}

@@ -47,7 +47,7 @@ public class GlobalExceptionHandler {
 
         Response response = new Response();
         response.setCode(400);
-        response.setDescription(e.getMessage());
+        response.setDescription("Bad Request: elements missing or type not correct");
 
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
