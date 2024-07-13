@@ -1,6 +1,7 @@
 package com.mycompany.bulk_transfer_application.controller;
 
-import com.mycompany.bulk_transfer_application.exception.BadRequestException;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +16,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mycompany.bulk_transfer_application.entity.BankAccount;
+import com.mycompany.bulk_transfer_application.exception.BadRequestException;
 import com.mycompany.bulk_transfer_application.pojo.Request;
 import com.mycompany.bulk_transfer_application.pojo.Response;
 import com.mycompany.bulk_transfer_application.service.TransferService;
+
+import jakarta.persistence.NoResultException;
+import jakarta.validation.Valid;
 
 /**
  * TransferController handles all the request that have /api as prefix
@@ -41,7 +46,7 @@ public class TransferController {
 	 * @return an entity with code 201 or 422 if the request can be processed
 	 */
 	@PostMapping(path = "/customer/transfers", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> bulkTransfer(@RequestBody Request transferRequest) {
+	public ResponseEntity<?> bulkTransfer(@Valid @RequestBody Request transferRequest) {
 		
 		logger.info("Request for /customer/transfers arrived, with body {}", transferRequest);
 		
@@ -56,15 +61,15 @@ public class TransferController {
 	
     // TODO: use also the organizationName to lookup the record (handle it in the lower levels)
 	@GetMapping(path = "/accounts", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> getBankAccountByBicAndIban(@RequestParam String organizationIban, @RequestParam String organizationBic) throws BadRequestException {
+	public ResponseEntity<?> getBankAccountByBicAndIban(@RequestParam(required = false) String organizationIban, @RequestParam(required = false) String organizationBic) throws BadRequestException {
 		
 		logger.info("Request for /accounts arrived, with params IBAN {} and BIC {}", organizationIban, organizationBic);
 		
 		// call a service to handle the request
-		BankAccount account = transferService.findBankAccountByBicIban(organizationBic, organizationIban);
-		
-		if(account != null) return ResponseEntity.status(HttpStatus.OK).body(account);
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+		List<BankAccount> accounts = transferService.findBankAccountByBicIban(organizationBic, organizationIban);
+		if(accounts.isEmpty()) throw new NoResultException();
+
+		return ResponseEntity.status(HttpStatus.OK).body(accounts);
 	}
 
 }

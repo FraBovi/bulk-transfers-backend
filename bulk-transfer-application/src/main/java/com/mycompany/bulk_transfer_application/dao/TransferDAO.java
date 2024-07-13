@@ -7,7 +7,7 @@ import com.mycompany.bulk_transfer_application.entity.TransferEntity;
 
 public interface TransferDAO {
 	
-	public BankAccount getBankAccountByBicAndIban(String orgBic, String orgIban);
+	public List<BankAccount> getBankAccountByBicAndIban(String orgBic, String orgIban);
 	public List<BankAccount> searchBankAccountsByBic(String orgBic);
 	public List<BankAccount> searchBankAccountsByIban(String orgIban);
 	public List<BankAccount> findAllBankAccounts();

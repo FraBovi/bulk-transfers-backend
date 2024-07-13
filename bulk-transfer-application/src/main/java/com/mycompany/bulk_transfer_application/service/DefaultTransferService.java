@@ -50,7 +50,7 @@ public class DefaultTransferService implements TransferService {
 		logger.info("Getting bank account info from DB using BIC {} and IBAN {}", organizationBic, organizationIban);
 		
 		// Getting BankAccount info from DB using BIC and IBAN
-		BankAccount account = transferDAO.getBankAccountByBicAndIban(organizationBic, organizationIban);
+		BankAccount account = transferDAO.getBankAccountByBicAndIban(organizationBic, organizationIban).get(0);
 		
 		logger.info("Bank Account information retrieved {}", account);
 		

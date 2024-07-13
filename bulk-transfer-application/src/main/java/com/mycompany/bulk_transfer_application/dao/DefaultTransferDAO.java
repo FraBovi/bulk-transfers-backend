@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import com.mycompany.bulk_transfer_application.entity.BankAccount;
 import com.mycompany.bulk_transfer_application.entity.TransferEntity;
+import com.mycompany.bulk_transfer_application.exception.NoBankAccountFoundException;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
@@ -46,18 +47,20 @@ public class DefaultTransferDAO implements TransferDAO {
 	 * @return BankAccount class with DB info
 	 */
 	@Override
-	public BankAccount getBankAccountByBicAndIban(String orgBic, String orgIban) {
+	public List<BankAccount> getBankAccountByBicAndIban(String orgBic, String orgIban) {
 		
 		String sqlQuery = "from BankAccount where iban = :iban AND bic = :bic";
 		TypedQuery<BankAccount> query = entityManager.createQuery(sqlQuery, BankAccount.class);
 		query.setParameter("iban", orgIban);
 		query.setParameter("bic", orgBic);
 		
-		BankAccount account = null;
+		List<BankAccount> accounts = null;
         // BUG: the account might not exist. Why are you throwing up an exception?
-	    account = query.getSingleResult();
+	    accounts = query.getResultList();
+
+		if(accounts.isEmpty()) throw new NoBankAccountFoundException();
 	    
-	    return account;
+	    return accounts;
 	}
 
 	/**
@@ -73,6 +76,11 @@ public class DefaultTransferDAO implements TransferDAO {
 	
 	}
 
+	/**
+	 * Returns a list of BankAccount information from DB using organization Bic code
+	 * @param orgBic organization bic value
+	 * @return List<BankAccount> class with DB info
+	 */
 	@Override
 	public List<BankAccount> searchBankAccountsByBic(String orgBic) {
 		
@@ -82,10 +90,17 @@ public class DefaultTransferDAO implements TransferDAO {
 		
 		List<BankAccount> accounts = null;
 	    accounts = query.getResultList();
+
+		if(accounts.isEmpty()) throw new NoBankAccountFoundException();
 	    
 	    return accounts;
 	}
 
+	/**
+	 * Returns a list of BankAccount information from DB using organization Iban code
+	 * @param orgIban organization iban value
+	 * @return List<BankAccount> class with DB info
+	 */
 	@Override
 	public List<BankAccount> searchBankAccountsByIban(String orgIban) {
 
@@ -95,11 +110,16 @@ public class DefaultTransferDAO implements TransferDAO {
 		
 		List<BankAccount> accounts = null;
 	    accounts = query.getResultList();
+
+		if(accounts.isEmpty()) throw new NoBankAccountFoundException();
 	    
 	    return accounts;
 
 	}
 
+	/**
+	 * @return all the BankAccount items from the DB
+	 */
 	@Override
 	public List<BankAccount> findAllBankAccounts() {
 
@@ -108,6 +128,8 @@ public class DefaultTransferDAO implements TransferDAO {
 		
 		List<BankAccount> accounts = null;
 	    accounts = query.getResultList();
+
+		if(accounts.isEmpty()) throw new NoBankAccountFoundException();
 	    
 	    return accounts;
 

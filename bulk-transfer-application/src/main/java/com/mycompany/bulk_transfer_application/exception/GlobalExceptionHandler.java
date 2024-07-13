@@ -4,11 +4,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import com.mycompany.bulk_transfer_application.pojo.Response;
 
-import jakarta.persistence.NoResultException;
+import com.mycompany.bulk_transfer_application.pojo.Response;
 
 // Provides handling for exceptions throughout this service.
 @ControllerAdvice
@@ -28,20 +28,20 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler(NoResultException.class)
-    public final ResponseEntity<Response> handleException(NoResultException e) {
+    @ExceptionHandler(NoBankAccountFoundException.class)
+    public final ResponseEntity<Response> handleException(NoBankAccountFoundException e) {
 
-        logger.error("NoResultException exception ", e);
+        logger.error("NoBankAccountFoundException exception ", e);
 
         Response response = new Response();
         response.setCode(404);
-        response.setDescription("Organization not found");
+        response.setDescription("No items found in the DB that matches the query");
 
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(BadRequestException.class)
-    public final ResponseEntity<Response> handleException(BadRequestException e) {
+    @ExceptionHandler(value = {BadRequestException.class, MethodArgumentNotValidException.class})
+    public final ResponseEntity<Response> handleException(MethodArgumentNotValidException e) {
 
         logger.error("BadRequestException exception ", e);
 
