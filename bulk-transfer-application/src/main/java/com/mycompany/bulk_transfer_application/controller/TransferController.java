@@ -30,46 +30,52 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/api")
 public class TransferController {
-	
-	private static final Logger logger = LoggerFactory.getLogger(TransferController.class); 
-	
-	private TransferService transferService;
-	
-	@Autowired
-	public TransferController(TransferService transferService) {
-		this.transferService = transferService;
-	}
-	
-	/**
-	 * function that handle a POST for bulk transfers
-	 * @param transferRequest represents the body of the request
-	 * @return an entity with code 201 or 422 if the request can be processed
-	 */
-	@PostMapping(path = "/customer/transfers", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> bulkTransfer(@Valid @RequestBody Request transferRequest) {
-		
-		logger.info("Request for /customer/transfers arrived, with body {}", transferRequest);
-		
-		// call a service to handle the request
-		Response response = transferService.insertTransfers(transferRequest);
-		
-		logger.info("Sending response {}", response);
-		
-		if(response.getCode() == 1) return ResponseEntity.status(HttpStatus.CREATED).body(response);
-		return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(response);
-	}
-	
-    // TODO: use also the organizationName to lookup the record (handle it in the lower levels)
-	@GetMapping(path = "/accounts", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> getBankAccountByBicAndIban(@RequestParam(required = false) String organizationIban, @RequestParam(required = false) String organizationBic) throws BadRequestException {
-		
-		logger.info("Request for /accounts arrived, with params IBAN {} and BIC {}", organizationIban, organizationBic);
-		
-		// call a service to handle the request
-		List<BankAccount> accounts = transferService.findBankAccountByBicIban(organizationBic, organizationIban);
-		if(accounts.isEmpty()) throw new NoResultException();
 
-		return ResponseEntity.status(HttpStatus.OK).body(accounts);
-	}
+    private static final Logger logger = LoggerFactory.getLogger(TransferController.class);
+
+    private TransferService transferService;
+
+    @Autowired
+    public TransferController(TransferService transferService) {
+        this.transferService = transferService;
+    }
+
+    /**
+     * function that handle a POST for bulk transfers
+     * 
+     * @param transferRequest represents the body of the request
+     * @return an entity with code 201 or 422 if the request can be processed
+     */
+    @PostMapping(path = "/customer/transfers", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> bulkTransfer(@Valid @RequestBody Request transferRequest) {
+
+        logger.info("Request for /customer/transfers arrived, with body {}", transferRequest);
+
+        // call a service to handle the request
+        Response response = transferService.insertTransfers(transferRequest);
+
+        logger.info("Sending response {}", response);
+
+        if (response.getCode() == 1)
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(response);
+    }
+
+    // TODO: use also the organizationName to lookup the record (handle it in the
+    // lower levels)
+    // This TODO has not been addressed.
+    @GetMapping(path = "/accounts", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getBankAccountByBicAndIban(@RequestParam(required = false) String organizationIban,
+            @RequestParam(required = false) String organizationBic) throws BadRequestException {
+
+        logger.info("Request for /accounts arrived, with params IBAN {} and BIC {}", organizationIban, organizationBic);
+
+        // call a service to handle the request
+        List<BankAccount> accounts = transferService.findBankAccountByBicIban(organizationBic, organizationIban);
+        if (accounts.isEmpty())
+            throw new NoResultException();
+
+        return ResponseEntity.status(HttpStatus.OK).body(accounts);
+    }
 
 }

@@ -18,121 +18,130 @@ import jakarta.transaction.Transactional;
  */
 @Repository
 public class DefaultTransferDAO implements TransferDAO {
-	
-	private EntityManager entityManager;
-	
-	@Autowired
-	public DefaultTransferDAO(EntityManager entityManager) {
-		this.entityManager = entityManager;
-	}
-	
-	/**
-	 * Update account information on DB using with the @param account
-	 * 
-	 * @param account with updated information
-	 * @return updated BankAccount
-	 */
-	@Override
-	@Transactional
-	public BankAccount updateBankAccount(BankAccount account) {
-		return entityManager.merge(account);
-	}
 
-	/**
-	 * Returns BankAccount DB information using @param orgBic and
-	 * @param orgIban
-	 * 
-	 * @param orgBic organization bic value
-	 * @param orgIban organization iban value
-	 * @return BankAccount class with DB info
-	 */
-	@Override
-	public List<BankAccount> getBankAccountByBicAndIban(String orgBic, String orgIban) {
-		
-		String sqlQuery = "from BankAccount where iban = :iban AND bic = :bic";
-		TypedQuery<BankAccount> query = entityManager.createQuery(sqlQuery, BankAccount.class);
-		query.setParameter("iban", orgIban);
-		query.setParameter("bic", orgBic);
-		
-		List<BankAccount> accounts = null;
+    private EntityManager entityManager;
+
+    @Autowired
+    public DefaultTransferDAO(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
+
+    /**
+     * Update account information on DB using with the @param account
+     * 
+     * @param account with updated information
+     * @return updated BankAccount
+     */
+    @Override
+    @Transactional
+    public BankAccount updateBankAccount(BankAccount account) {
+        return entityManager.merge(account);
+    }
+
+    /**
+     * Returns BankAccount DB information using @param orgBic and
+     * 
+     * @param orgIban
+     * 
+     * @param orgBic  organization bic value
+     * @param orgIban organization iban value
+     * @return BankAccount class with DB info
+     */
+    @Override
+    public List<BankAccount> getBankAccountByBicAndIban(String orgBic, String orgIban) {
+
+        String sqlQuery = "from BankAccount where iban = :iban AND bic = :bic";
+        TypedQuery<BankAccount> query = entityManager.createQuery(sqlQuery, BankAccount.class);
+        query.setParameter("iban", orgIban);
+        query.setParameter("bic", orgBic);
+
+        List<BankAccount> accounts = null;
         // BUG: the account might not exist. Why are you throwing up an exception?
-	    accounts = query.getResultList();
+        // This BUG needs to be addressed.
+        accounts = query.getResultList();
 
-		if(accounts.isEmpty()) throw new NoBankAccountFoundException();
-	    
-	    return accounts;
-	}
+        if (accounts.isEmpty())
+            throw new NoBankAccountFoundException();
 
-	/**
-	 * Create a new transfer in the DB table
-	 * 
-	 * @param transfer is the new entity to insert in DB
-	 */
-	@Override
-	@Transactional
-	public void insertTransfers(TransferEntity transfer) {
-		
-		entityManager.persist(transfer);
-	
-	}
+        return accounts;
+    }
 
-	/**
-	 * Returns a list of BankAccount information from DB using organization Bic code
-	 * @param orgBic organization bic value
-	 * @return List<BankAccount> class with DB info
-	 */
-	@Override
-	public List<BankAccount> searchBankAccountsByBic(String orgBic) {
-		
-		String sqlQuery = "from BankAccount where bic = :bic";
-		TypedQuery<BankAccount> query = entityManager.createQuery(sqlQuery, BankAccount.class);
-		query.setParameter("bic", orgBic);
-		
-		List<BankAccount> accounts = null;
-	    accounts = query.getResultList();
+    /**
+     * Create a new transfer in the DB table
+     * 
+     * @param transfer is the new entity to insert in DB
+     */
+    @Override
+    @Transactional
+    public void insertTransfers(TransferEntity transfer) {
 
-		if(accounts.isEmpty()) throw new NoBankAccountFoundException();
-	    
-	    return accounts;
-	}
+        entityManager.persist(transfer);
 
-	/**
-	 * Returns a list of BankAccount information from DB using organization Iban code
-	 * @param orgIban organization iban value
-	 * @return List<BankAccount> class with DB info
-	 */
-	@Override
-	public List<BankAccount> searchBankAccountsByIban(String orgIban) {
+    }
 
-		String sqlQuery = "from BankAccount where iban = :iban";
-		TypedQuery<BankAccount> query = entityManager.createQuery(sqlQuery, BankAccount.class);
-		query.setParameter("iban", orgIban);
-		
-		List<BankAccount> accounts = null;
-	    accounts = query.getResultList();
+    /**
+     * Returns a list of BankAccount information from DB using organization Bic code
+     * 
+     * @param orgBic organization bic value
+     * @return List<BankAccount> class with DB info
+     */
+    @Override
+    public List<BankAccount> searchBankAccountsByBic(String orgBic) {
 
-		if(accounts.isEmpty()) throw new NoBankAccountFoundException();
-	    
-	    return accounts;
+        String sqlQuery = "from BankAccount where bic = :bic";
+        TypedQuery<BankAccount> query = entityManager.createQuery(sqlQuery, BankAccount.class);
+        query.setParameter("bic", orgBic);
 
-	}
+        List<BankAccount> accounts = null;
+        accounts = query.getResultList();
 
-	/**
-	 * @return all the BankAccount items from the DB
-	 */
-	@Override
-	public List<BankAccount> findAllBankAccounts() {
+        if (accounts.isEmpty())
+            throw new NoBankAccountFoundException();
 
-		String sqlQuery = "from BankAccount";
-		TypedQuery<BankAccount> query = entityManager.createQuery(sqlQuery, BankAccount.class);
-		
-		List<BankAccount> accounts = null;
-	    accounts = query.getResultList();
+        return accounts;
+    }
 
-		if(accounts.isEmpty()) throw new NoBankAccountFoundException();
-	    
-	    return accounts;
+    /**
+     * Returns a list of BankAccount information from DB using organization Iban
+     * code
+     * 
+     * @param orgIban organization iban value
+     * @return List<BankAccount> class with DB info
+     */
+    @Override
+    public List<BankAccount> searchBankAccountsByIban(String orgIban) {
 
-	}
+        String sqlQuery = "from BankAccount where iban = :iban";
+        TypedQuery<BankAccount> query = entityManager.createQuery(sqlQuery, BankAccount.class);
+        query.setParameter("iban", orgIban);
+
+        List<BankAccount> accounts = null;
+        accounts = query.getResultList();
+
+        if (accounts.isEmpty())
+            throw new NoBankAccountFoundException();
+
+        return accounts;
+
+    }
+
+    /**
+     * @return all the BankAccount items from the DB
+     */
+    @Override
+    public List<BankAccount> findAllBankAccounts() {
+
+        String sqlQuery = "from BankAccount";
+        TypedQuery<BankAccount> query = entityManager.createQuery(sqlQuery, BankAccount.class);
+
+        List<BankAccount> accounts = null;
+        accounts = query.getResultList();
+
+        if (accounts.isEmpty())
+            throw new NoBankAccountFoundException();
+
+        return accounts;
+
+    }
 
 }
