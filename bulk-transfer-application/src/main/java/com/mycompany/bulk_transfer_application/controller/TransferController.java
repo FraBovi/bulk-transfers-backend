@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mycompany.bulk_transfer_application.entity.BankAccount;
-import com.mycompany.bulk_transfer_application.exception.BadRequestException;
 import com.mycompany.bulk_transfer_application.exception.CreditNotSufficientException;
 import com.mycompany.bulk_transfer_application.pojo.Request;
 import com.mycompany.bulk_transfer_application.pojo.Response;
@@ -66,7 +65,7 @@ public class TransferController {
     // This TODO has not been addressed.
     @GetMapping(path = "/accounts", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getBankAccountByBicAndIban(@RequestParam(required = false) String organizationIban,
-            @RequestParam(required = false) String organizationBic, @RequestParam(required = false) String organizationName) throws BadRequestException {
+            @RequestParam(required = false) String organizationBic, @RequestParam(required = false) String organizationName) {
 
         logger.info("Request for /accounts arrived, with params IBAN {} - BIC {} - NAME {}", organizationIban, organizationBic, organizationName);
 

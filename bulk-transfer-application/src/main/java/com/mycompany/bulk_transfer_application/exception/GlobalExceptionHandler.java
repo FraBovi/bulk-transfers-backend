@@ -1,17 +1,20 @@
 package com.mycompany.bulk_transfer_application.exception;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 // Provides handling for exceptions throughout this service.
 @ControllerAdvice
-public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+public class GlobalExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
@@ -31,20 +34,37 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     
     }
 
-    @ExceptionHandler(value = {BadRequestException.class, MethodArgumentNotValidException.class})
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     public final ResponseEntity<Object> handleException(MethodArgumentNotValidException e) {
 
         logger.error("BadRequestException exception ", e);
-        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, e.getMessage(), e));
+
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, badRequestMsgBuilder(e), e));
     
     }
 
-    @ExceptionHandler(value = {CreditNotSufficientException.class})
+    @ExceptionHandler(CreditNotSufficientException.class)
     public final ResponseEntity<Object> handleException(CreditNotSufficientException e) {
 
         logger.error("CreditNotSufficientException exception ", e);
         return buildResponseEntity(new ApiError(HttpStatus.UNPROCESSABLE_ENTITY, e.getMessage(), e));
     
+    }
+
+    private String badRequestMsgBuilder(MethodArgumentNotValidException e) {
+
+        StringBuilder errorMsg = new StringBuilder("Error in fields: ");
+        
+        Map<String, String> errors = new HashMap<>();
+        e.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMsgField = error.getDefaultMessage();
+            errors.put(fieldName, errorMsgField);
+        });
+        errorMsg.append(errors.toString());
+
+        return errorMsg.toString();
+
     }
 
     private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {

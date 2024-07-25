@@ -129,7 +129,7 @@ public class TransferDAO {
      */
     public List<BankAccount> searchBankAccountsByName(String orgName) {
 
-        String sqlQuery = "from BankAccount where organization_name = :name";
+        String sqlQuery = "from BankAccount where organizationName = :name";
         TypedQuery<BankAccount> query = entityManager.createQuery(sqlQuery, BankAccount.class);
         query.setParameter("name", orgName);
 
