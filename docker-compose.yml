@@ -1,3 +1,5 @@
+# FIXME: if I run the `start.sh` script it doesn't work.
+# FIXME: I also tried `docker-compose up mysqldb` with no luck.
 services:
   mysqldb:
     image: "mysql:8.0"

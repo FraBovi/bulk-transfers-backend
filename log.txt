@@ -1,0 +1,69 @@
+Pulling mysqldb     ... done
+Pulling api_service ... done
+mysqldb uses an image, skipping
+Building api_service
+[+] Building 0.6s (9/9) FINISHED                                                                                                                                                                                                                   docker:default
+ => [internal] load build definition from Dockerfile                                                                                                                                                                                                         0.0s
+ => => transferring dockerfile: 337B                                                                                                                                                                                                                         0.0s
+ => [internal] load metadata for docker.io/library/maven:3.8.3-openjdk-17                                                                                                                                                                                    0.4s
+ => [internal] load .dockerignore                                                                                                                                                                                                                            0.0s
+ => => transferring context: 2B                                                                                                                                                                                                                              0.0s
+ => [1/4] FROM docker.io/library/maven:3.8.3-openjdk-17@sha256:8a66581a077762c8752a9f64f73cdd8c59e9c4446eb810417119e0436b075931                                                                                                                              0.0s
+ => [internal] load build context                                                                                                                                                                                                                            0.0s
+ => => transferring context: 3.94kB                                                                                                                                                                                                                          0.0s
+ => CACHED [2/4] COPY bulk-transfer-application/src /home/app/src                                                                                                                                                                                            0.0s
+ => CACHED [3/4] COPY bulk-transfer-application/pom.xml /home/app                                                                                                                                                                                            0.0s
+ => CACHED [4/4] RUN mvn -f /home/app/pom.xml clean package -DskipTests=true                                                                                                                                                                                 0.0s
+ => exporting to image                                                                                                                                                                                                                                       0.0s
+ => => exporting layers                                                                                                                                                                                                                                      0.0s
+ => => writing image sha256:a74def974e4d1d11a777ecd3045aa335cd0a0f25b1b079e5e4204ebc84ffff4e                                                                                                                                                                 0.0s
+ => => naming to docker.io/library/bulk-transfers-backend_api_service                                                                                                                                                                                        0.0s
+Recreating 9eb00f49d9b2_mysqldb ... 
+
+ERROR: for 9eb00f49d9b2_mysqldb  'ContainerConfig'
+
+ERROR: for mysqldb  'ContainerConfig'
+Traceback (most recent call last):
+  File "/usr/bin/docker-compose", line 33, in <module>
+    sys.exit(load_entry_point('docker-compose==1.29.2', 'console_scripts', 'docker-compose')())
+  File "/usr/lib/python3/dist-packages/compose/cli/main.py", line 81, in main
+    command_func()
+  File "/usr/lib/python3/dist-packages/compose/cli/main.py", line 203, in perform_command
+    handler(command, command_options)
+  File "/usr/lib/python3/dist-packages/compose/metrics/decorator.py", line 18, in wrapper
+    result = fn(*args, **kwargs)
+  File "/usr/lib/python3/dist-packages/compose/cli/main.py", line 1186, in up
+    to_attach = up(False)
+  File "/usr/lib/python3/dist-packages/compose/cli/main.py", line 1166, in up
+    return self.project.up(
+  File "/usr/lib/python3/dist-packages/compose/project.py", line 697, in up
+    results, errors = parallel.parallel_execute(
+  File "/usr/lib/python3/dist-packages/compose/parallel.py", line 108, in parallel_execute
+    raise error_to_reraise
+  File "/usr/lib/python3/dist-packages/compose/parallel.py", line 206, in producer
+    result = func(obj)
+  File "/usr/lib/python3/dist-packages/compose/project.py", line 679, in do
+    return service.execute_convergence_plan(
+  File "/usr/lib/python3/dist-packages/compose/service.py", line 579, in execute_convergence_plan
+    return self._execute_convergence_recreate(
+  File "/usr/lib/python3/dist-packages/compose/service.py", line 499, in _execute_convergence_recreate
+    containers, errors = parallel_execute(
+  File "/usr/lib/python3/dist-packages/compose/parallel.py", line 108, in parallel_execute
+    raise error_to_reraise
+  File "/usr/lib/python3/dist-packages/compose/parallel.py", line 206, in producer
+    result = func(obj)
+  File "/usr/lib/python3/dist-packages/compose/service.py", line 494, in recreate
+    return self.recreate_container(
+  File "/usr/lib/python3/dist-packages/compose/service.py", line 612, in recreate_container
+    new_container = self.create_container(
+  File "/usr/lib/python3/dist-packages/compose/service.py", line 330, in create_container
+    container_options = self._get_container_create_options(
+  File "/usr/lib/python3/dist-packages/compose/service.py", line 921, in _get_container_create_options
+    container_options, override_options = self._build_container_volume_options(
+  File "/usr/lib/python3/dist-packages/compose/service.py", line 960, in _build_container_volume_options
+    binds, affinity = merge_volume_bindings(
+  File "/usr/lib/python3/dist-packages/compose/service.py", line 1548, in merge_volume_bindings
+    old_volumes, old_mounts = get_container_data_volumes(
+  File "/usr/lib/python3/dist-packages/compose/service.py", line 1579, in get_container_data_volumes
+    container.image_config['ContainerConfig'].get('Volumes') or {}
+KeyError: 'ContainerConfig'
