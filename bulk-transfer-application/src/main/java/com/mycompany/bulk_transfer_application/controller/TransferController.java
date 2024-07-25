@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.mycompany.bulk_transfer_application.entity.BankAccount;
 import com.mycompany.bulk_transfer_application.exception.BadRequestException;
+import com.mycompany.bulk_transfer_application.exception.CreditNotSufficientException;
 import com.mycompany.bulk_transfer_application.pojo.Request;
 import com.mycompany.bulk_transfer_application.pojo.Response;
 import com.mycompany.bulk_transfer_application.service.TransferService;
@@ -45,9 +46,10 @@ public class TransferController {
      * 
      * @param transferRequest represents the body of the request
      * @return an entity with code 201 or 422 if the request can be processed
+     * @throws CreditNotSufficientException 
      */
     @PostMapping(path = "/customer/transfers", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> bulkTransfer(@Valid @RequestBody Request transferRequest) {
+    public ResponseEntity<?> bulkTransfer(@Valid @RequestBody Request transferRequest) throws CreditNotSufficientException {
 
         logger.info("Request for /customer/transfers arrived, with body {}", transferRequest);
 
@@ -56,9 +58,7 @@ public class TransferController {
 
         logger.info("Sending response {}", response);
 
-        if (response.getCode() == 1)
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     // TODO: use also the organizationName to lookup the record (handle it in the
@@ -66,12 +66,12 @@ public class TransferController {
     // This TODO has not been addressed.
     @GetMapping(path = "/accounts", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getBankAccountByBicAndIban(@RequestParam(required = false) String organizationIban,
-            @RequestParam(required = false) String organizationBic) throws BadRequestException {
+            @RequestParam(required = false) String organizationBic, @RequestParam(required = false) String organizationName) throws BadRequestException {
 
-        logger.info("Request for /accounts arrived, with params IBAN {} and BIC {}", organizationIban, organizationBic);
+        logger.info("Request for /accounts arrived, with params IBAN {} - BIC {} - NAME {}", organizationIban, organizationBic, organizationName);
 
         // call a service to handle the request
-        List<BankAccount> accounts = transferService.findBankAccountByBicIban(organizationBic, organizationIban);
+        List<BankAccount> accounts = transferService.findBankAccountByParameters(organizationBic, organizationIban, organizationName);
         if (accounts.isEmpty())
             throw new NoResultException();
 

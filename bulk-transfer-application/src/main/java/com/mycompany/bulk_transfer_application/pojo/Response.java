@@ -23,7 +23,6 @@ public class Response {
      */
     // FIXME: get rid of this "code" and stick to a more consistent error handling.
     // Define your dictionary of errors that you're expecting from your app.
-    private int code;
     private String description;
 
 }

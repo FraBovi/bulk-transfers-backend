@@ -7,49 +7,47 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-
-import com.mycompany.bulk_transfer_application.pojo.Response;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 // Provides handling for exceptions throughout this service.
 @ControllerAdvice
-public class GlobalExceptionHandler {
+public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(Exception.class)
-    public final ResponseEntity<Response> handleException(Exception e) {
+    public final ResponseEntity<Object> handleException(Exception e) {
 
         logger.error("Exception exception ", e);
-
-        Response response = new Response();
-        response.setCode(-99);
-        response.setDescription(e.getMessage());
-
-        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        return buildResponseEntity(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e));
+    
     }
 
     @ExceptionHandler(NoBankAccountFoundException.class)
-    public final ResponseEntity<Response> handleException(NoBankAccountFoundException e) {
+    public final ResponseEntity<Object> handleException(NoBankAccountFoundException e) {
 
         logger.error("NoBankAccountFoundException exception ", e);
-
-        Response response = new Response();
-        response.setCode(404);
-        response.setDescription("No items found in the DB that matches the query");
-
-        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        return buildResponseEntity(new ApiError(HttpStatus.NOT_FOUND, "No items found in the DB that matches the query", e));
+    
     }
 
     @ExceptionHandler(value = {BadRequestException.class, MethodArgumentNotValidException.class})
-    public final ResponseEntity<Response> handleException(MethodArgumentNotValidException e) {
+    public final ResponseEntity<Object> handleException(MethodArgumentNotValidException e) {
 
         logger.error("BadRequestException exception ", e);
-
-        Response response = new Response();
-        response.setCode(400);
-        response.setDescription("Bad Request: elements missing or type not correct");
-
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-    }
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, e.getMessage(), e));
     
+    }
+
+    @ExceptionHandler(value = {CreditNotSufficientException.class})
+    public final ResponseEntity<Object> handleException(CreditNotSufficientException e) {
+
+        logger.error("CreditNotSufficientException exception ", e);
+        return buildResponseEntity(new ApiError(HttpStatus.UNPROCESSABLE_ENTITY, e.getMessage(), e));
+    
+    }
+
+    private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {
+        return new ResponseEntity<>(apiError, apiError.getStatus());
+    }
 }
