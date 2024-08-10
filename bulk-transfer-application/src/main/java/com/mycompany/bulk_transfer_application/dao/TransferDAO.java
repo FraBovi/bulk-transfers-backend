@@ -44,11 +44,11 @@ public class TransferDAO {
      */
     public List<BankAccount> searchBankAccounts(SearchParameters params) {
 
-        String sqlQuery = "from BankAccount where iban = :iban OR bic = :bic OR name = :name";
+        String sqlQuery = "from BankAccount where iban = :iban OR bic = :bic OR organizationName = :organizationName";
         TypedQuery<BankAccount> query = entityManager.createQuery(sqlQuery, BankAccount.class);
         query.setParameter("iban", params.getIban());
         query.setParameter("bic", params.getBic());
-        query.setParameter("name", params.getName());
+        query.setParameter("organizationName", params.getName());
 
         List<BankAccount> accounts = null;
         accounts = query.getResultList();

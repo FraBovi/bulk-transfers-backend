@@ -16,6 +16,7 @@ import com.mycompany.bulk_transfer_application.dto.Transfer;
 import com.mycompany.bulk_transfer_application.entity.BankAccount;
 import com.mycompany.bulk_transfer_application.entity.TransferEntity;
 import com.mycompany.bulk_transfer_application.exception.CreditNotSufficientException;
+import com.mycompany.bulk_transfer_application.exception.NoBankAccountFoundException;
 
 /**
  * This is the service where all business logic is applied and
@@ -54,7 +55,11 @@ public class TransferService {
         SearchParameters searchParameters = new SearchParameters(organizationBic, organizationIban, null);
 
         // Getting BankAccount info from DB using BIC and IBAN
-        BankAccount account = transferDAO.searchBankAccounts(searchParameters).get(0);
+        List<BankAccount> accountsFound = transferDAO.searchBankAccounts(searchParameters);
+
+        if(accountsFound.isEmpty()) throw new NoBankAccountFoundException();
+
+        BankAccount account = accountsFound.get(0); 
 
         logger.info("Bank Account information retrieved {}", account);
 

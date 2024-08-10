@@ -81,8 +81,6 @@ public class TransferController {
 
         // call a service to handle the request
         List<BankAccount> accounts = transferDAO.searchBankAccounts(params);
-        if (accounts.isEmpty())
-            throw new NoResultException();
 
         return ResponseEntity.status(HttpStatus.OK).body(accounts);
     }
