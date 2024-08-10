@@ -9,16 +9,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mycompany.bulk_transfer_application.dao.TransferDAO;
+import com.mycompany.bulk_transfer_application.dto.Request;
+import com.mycompany.bulk_transfer_application.dto.SearchParameters;
 import com.mycompany.bulk_transfer_application.entity.BankAccount;
+import com.mycompany.bulk_transfer_application.entity.TransferEntity;
+import com.mycompany.bulk_transfer_application.exception.AmountFormatException;
 import com.mycompany.bulk_transfer_application.exception.CreditNotSufficientException;
-import com.mycompany.bulk_transfer_application.pojo.Request;
-import com.mycompany.bulk_transfer_application.pojo.Response;
 import com.mycompany.bulk_transfer_application.service.TransferService;
 
 import jakarta.persistence.NoResultException;
@@ -35,9 +38,12 @@ public class TransferController {
 
     private TransferService transferService;
 
+    private TransferDAO transferDAO;
+
     @Autowired
-    public TransferController(TransferService transferService) {
+    public TransferController(TransferService transferService, TransferDAO transferDAO) {
         this.transferService = transferService;
+        this.transferDAO = transferDAO;
     }
 
     /**
@@ -48,29 +54,33 @@ public class TransferController {
      * @throws CreditNotSufficientException 
      */
     @PostMapping(path = "/customer/transfers", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> bulkTransfer(@Valid @RequestBody Request transferRequest) throws CreditNotSufficientException {
+    public ResponseEntity<?> bulkTransfer(@Valid @RequestBody Request transferRequest) throws CreditNotSufficientException, NumberFormatException {
 
         logger.info("Request for /customer/transfers arrived, with body {}", transferRequest);
 
         // call a service to handle the request
-        Response response = transferService.insertTransfers(transferRequest);
+        try {
+            
+            List<TransferEntity> response = transferService.insertTransfers(transferRequest);
+            logger.info("Sending response {}", response);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
 
-        logger.info("Sending response {}", response);
+        } catch (NumberFormatException e) {
+            throw new AmountFormatException();
+        }
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     // TODO: use also the organizationName to lookup the record (handle it in the
     // lower levels)
-    // This TODO has not been addressed.
+    // MEET 02-08 
     @GetMapping(path = "/accounts", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getBankAccountByBicAndIban(@RequestParam(required = false) String organizationIban,
-            @RequestParam(required = false) String organizationBic, @RequestParam(required = false) String organizationName) {
+    public ResponseEntity<?> searchAccount(@ModelAttribute SearchParameters params) {
 
-        logger.info("Request for /accounts arrived, with params IBAN {} - BIC {} - NAME {}", organizationIban, organizationBic, organizationName);
+        logger.info("Request for /accounts arrived, with params IBAN {} - BIC {} - NAME {}", params.getIban(),params.getBic(), params.getName());
 
         // call a service to handle the request
-        List<BankAccount> accounts = transferService.findBankAccountByParameters(organizationBic, organizationIban, organizationName);
+        List<BankAccount> accounts = transferDAO.searchBankAccounts(params);
         if (accounts.isEmpty())
             throw new NoResultException();
 

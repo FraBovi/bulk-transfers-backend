@@ -51,6 +51,14 @@ public class GlobalExceptionHandler {
     
     }
 
+    @ExceptionHandler(AmountFormatException.class)
+    public final ResponseEntity<Object> handleException(AmountFormatException e) {
+
+        logger.error("AmountFormatException exception ", e);
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, e.getMessage(), e));
+    
+    }
+
     private String badRequestMsgBuilder(MethodArgumentNotValidException e) {
 
         StringBuilder errorMsg = new StringBuilder("Error in fields: ");
@@ -68,6 +76,6 @@ public class GlobalExceptionHandler {
     }
 
     private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {
-        return new ResponseEntity<>(apiError, apiError.getStatus());
+        return new ResponseEntity<>(apiError, apiError.getCode());
     }
 }

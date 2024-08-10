@@ -1,4 +1,4 @@
-package com.mycompany.bulk_transfer_application.pojo;
+package com.mycompany.bulk_transfer_application.dto;
 
 import java.util.List;
 

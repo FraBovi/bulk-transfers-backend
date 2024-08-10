@@ -1,5 +1,6 @@
 package com.mycompany.bulk_transfer_application.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -9,26 +10,18 @@ import org.springframework.stereotype.Service;
 
 import com.mycompany.bulk_transfer_application.BulkUtils;
 import com.mycompany.bulk_transfer_application.dao.TransferDAO;
+import com.mycompany.bulk_transfer_application.dto.Request;
+import com.mycompany.bulk_transfer_application.dto.SearchParameters;
+import com.mycompany.bulk_transfer_application.dto.Transfer;
 import com.mycompany.bulk_transfer_application.entity.BankAccount;
 import com.mycompany.bulk_transfer_application.entity.TransferEntity;
 import com.mycompany.bulk_transfer_application.exception.CreditNotSufficientException;
-import com.mycompany.bulk_transfer_application.pojo.Request;
-import com.mycompany.bulk_transfer_application.pojo.Response;
-import com.mycompany.bulk_transfer_application.pojo.Transfer;
 
 /**
  * This is the service where all business logic is applied and
  * it uses the TransferDAO class that interacts with the DB for CRUD operations
  */
 @Service
-// TODO: why "Default" prefix? Only to differentiate it from the interface name?
-// Why not prepending the latter with the prefix "I" or leave it as it is if the
-// compiler doesn't complain.
-// My fist idea was to use the prefix "I" as you suggest, but after reading this
-// https://stackoverflow.com/questions/2814805/java-interfaces-implementation-naming-convention/2815440
-// I change my mind.
-// Based on the article you shared, let's get rid of this interface for now. Try
-// to remove the "TransferService" interface and see if we're still good to go.
 public class TransferService {
 
     private static final Logger logger = LoggerFactory.getLogger(TransferService.class);
@@ -51,15 +44,17 @@ public class TransferService {
      * @return Response which can be with code 1 for successful and -99 otherwise
      * @throws CreditNotSufficientException 
      */
-    public Response insertTransfers(Request request) throws CreditNotSufficientException {
+    public List<TransferEntity> insertTransfers(Request request) throws CreditNotSufficientException, NumberFormatException {
 
         String organizationBic = request.getOrganizationBic();
         String organizationIban = request.getOrganizationIban();
 
         logger.info("Getting bank account info from DB using BIC {} and IBAN {}", organizationBic, organizationIban);
 
+        SearchParameters searchParameters = new SearchParameters(organizationBic, organizationIban, null);
+
         // Getting BankAccount info from DB using BIC and IBAN
-        BankAccount account = transferDAO.getBankAccountByBicAndIban(organizationBic, organizationIban).get(0);
+        BankAccount account = transferDAO.searchBankAccounts(searchParameters).get(0);
 
         logger.info("Bank Account information retrieved {}", account);
 
@@ -70,8 +65,6 @@ public class TransferService {
         Integer accountBalance = Integer.parseInt(account.getBalanceCents());
 
         logger.info("Balance in cents {} - Total transfer amount in cents{}", accountBalance, totalAmountTransfer);
-
-        Response response = new Response();
 
         // If the organization has not enough money the bulk transfer is not allowed
         // -99 is returned as response
@@ -84,6 +77,8 @@ public class TransferService {
 
         logger.info("Operation allowed");
 
+        List<TransferEntity> newTransfers = new ArrayList<>();
+
         // For each transfer in the bulk we add it to DB and update organization balance
         for (Transfer transfer : incomingTransfers) {
 
@@ -91,6 +86,7 @@ public class TransferService {
 
             TransferEntity transferEntity = createTransferEntity(transfer, account);
             transferDAO.insertTransfers(transferEntity);
+            newTransfers.add(transferEntity);
 
             accountBalance -= transferEntity.getAmountCents();
             account.setBalanceCents(accountBalance.toString());
@@ -99,11 +95,9 @@ public class TransferService {
 
             transferDAO.updateBankAccount(account);
 
-            response.setDescription("Transfers done successfully");
-
         }
 
-        return response;
+        return newTransfers;
 
     }
 
@@ -113,7 +107,7 @@ public class TransferService {
      * @param transfers a list with all the transfers
      * @return an integer with the total value of the bulk transfer
      */
-    private Integer calculateTotalAmount(List<Transfer> transfers) {
+    private Integer calculateTotalAmount(List<Transfer> transfers) throws NumberFormatException {
         return transfers.stream().mapToInt(transfer -> BulkUtils.getCentsOfEuros(transfer.getAmount())).sum();
     }
 
@@ -126,7 +120,7 @@ public class TransferService {
      * 
      * @return the TransferEntity added in the DB table
      */
-    private TransferEntity createTransferEntity(Transfer transfer, BankAccount account) {
+    private TransferEntity createTransferEntity(Transfer transfer, BankAccount account) throws NumberFormatException {
 
         TransferEntity transferEntity = new TransferEntity();
 
@@ -140,24 +134,4 @@ public class TransferService {
         return transferEntity;
     }
 
-    // TODO: this could be skipped by invoking directly the DAO?
-    // Yes , idk if calling the DAO directly by the Controller would be better than
-    // this boilerplate code
-    // however this can be removed if you think.
-    // I believe that if you don't need any complex logic, it's fair to invoke
-    // directly the DAO.
-    public List<BankAccount> findBankAccountByParameters(String bic, String iban, String name) {
-
-        if (iban != null && bic != null)
-            return transferDAO.getBankAccountByBicAndIban(bic, iban);
-        if (iban != null)
-            return transferDAO.searchBankAccountsByIban(iban);
-        if (bic != null)
-            return transferDAO.searchBankAccountsByBic(bic);
-        if (name != null)
-            return transferDAO.searchBankAccountsByName(name);
-
-        return transferDAO.findAllBankAccounts();
-
-    }
 }

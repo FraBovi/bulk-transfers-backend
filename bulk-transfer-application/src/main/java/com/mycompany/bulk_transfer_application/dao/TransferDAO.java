@@ -5,9 +5,9 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.mycompany.bulk_transfer_application.dto.SearchParameters;
 import com.mycompany.bulk_transfer_application.entity.BankAccount;
 import com.mycompany.bulk_transfer_application.entity.TransferEntity;
-import com.mycompany.bulk_transfer_application.exception.NoBankAccountFoundException;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
@@ -38,28 +38,20 @@ public class TransferDAO {
     }
 
     /**
-     * Returns BankAccount DB information using @param orgBic and
+     * Returns BankAccount DB information using @param params
      * 
-     * @param orgIban
-     * 
-     * @param orgBic  organization bic value
-     * @param orgIban organization iban value
      * @return BankAccount class with DB info
      */
-    public List<BankAccount> getBankAccountByBicAndIban(String orgBic, String orgIban) {
+    public List<BankAccount> searchBankAccounts(SearchParameters params) {
 
-        String sqlQuery = "from BankAccount where iban = :iban AND bic = :bic";
+        String sqlQuery = "from BankAccount where iban = :iban OR bic = :bic OR name = :name";
         TypedQuery<BankAccount> query = entityManager.createQuery(sqlQuery, BankAccount.class);
-        query.setParameter("iban", orgIban);
-        query.setParameter("bic", orgBic);
+        query.setParameter("iban", params.getIban());
+        query.setParameter("bic", params.getBic());
+        query.setParameter("name", params.getName());
 
         List<BankAccount> accounts = null;
-        // BUG: the account might not exist. Why are you throwing up an exception?
-        // This BUG needs to be addressed.
         accounts = query.getResultList();
-
-        if (accounts.isEmpty())
-            throw new NoBankAccountFoundException();
 
         return accounts;
     }
@@ -77,73 +69,6 @@ public class TransferDAO {
     }
 
     /**
-     * Returns a list of BankAccount information from DB using organization Bic code
-     * 
-     * @param orgBic organization bic value
-     * @return List<BankAccount> class with DB info
-     */
-    public List<BankAccount> searchBankAccountsByBic(String orgBic) {
-
-        String sqlQuery = "from BankAccount where bic = :bic";
-        TypedQuery<BankAccount> query = entityManager.createQuery(sqlQuery, BankAccount.class);
-        query.setParameter("bic", orgBic);
-
-        List<BankAccount> accounts = null;
-        accounts = query.getResultList();
-
-        if (accounts.isEmpty())
-            throw new NoBankAccountFoundException();
-
-        return accounts;
-    }
-
-    /**
-     * Returns a list of BankAccount information from DB using organization Iban
-     * code
-     * 
-     * @param orgIban organization iban value
-     * @return List<BankAccount> class with DB info
-     */
-    public List<BankAccount> searchBankAccountsByIban(String orgIban) {
-
-        String sqlQuery = "from BankAccount where iban = :iban";
-        TypedQuery<BankAccount> query = entityManager.createQuery(sqlQuery, BankAccount.class);
-        query.setParameter("iban", orgIban);
-
-        List<BankAccount> accounts = null;
-        accounts = query.getResultList();
-
-        if (accounts.isEmpty())
-            throw new NoBankAccountFoundException();
-
-        return accounts;
-
-    }
-
-    /**
-     * Returns a list of BankAccount information from DB using organization Name
-     *
-     * 
-     * @param orgName organization name value
-     * @return List<BankAccount> class with DB info
-     */
-    public List<BankAccount> searchBankAccountsByName(String orgName) {
-
-        String sqlQuery = "from BankAccount where organizationName = :name";
-        TypedQuery<BankAccount> query = entityManager.createQuery(sqlQuery, BankAccount.class);
-        query.setParameter("name", orgName);
-
-        List<BankAccount> accounts = null;
-        accounts = query.getResultList();
-
-        if (accounts.isEmpty())
-            throw new NoBankAccountFoundException();
-
-        return accounts;
-
-    }
-
-    /**
      * @return all the BankAccount items from the DB
      */
     public List<BankAccount> findAllBankAccounts() {
@@ -153,9 +78,6 @@ public class TransferDAO {
 
         List<BankAccount> accounts = null;
         accounts = query.getResultList();
-
-        if (accounts.isEmpty())
-            throw new NoBankAccountFoundException();
 
         return accounts;
 
