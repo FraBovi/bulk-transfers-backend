@@ -12,6 +12,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import com.mycompany.bulk_transfer_application.BulkConstants;
+
 // Provides handling for exceptions throughout this service.
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -30,7 +32,7 @@ public class GlobalExceptionHandler {
     public final ResponseEntity<Object> handleException(NoBankAccountFoundException e) {
 
         logger.error("NoBankAccountFoundException exception ", e);
-        return buildResponseEntity(new ApiError(HttpStatus.NOT_FOUND, "No items found in the DB that matches the query", e));
+        return buildResponseEntity(new ApiError(HttpStatus.NOT_FOUND, BulkConstants.BANK_ACCOUNT_NOT_FOUND, e));
     
     }
 
@@ -47,7 +49,7 @@ public class GlobalExceptionHandler {
     public final ResponseEntity<Object> handleException(CreditNotSufficientException e) {
 
         logger.error("CreditNotSufficientException exception ", e);
-        return buildResponseEntity(new ApiError(HttpStatus.UNPROCESSABLE_ENTITY, e.getMessage(), e));
+        return buildResponseEntity(new ApiError(HttpStatus.UNPROCESSABLE_ENTITY, BulkConstants.CREDIT_NOT_SUFFICIENT, e));
     
     }
 
@@ -55,7 +57,7 @@ public class GlobalExceptionHandler {
     public final ResponseEntity<Object> handleException(AmountFormatException e) {
 
         logger.error("AmountFormatException exception ", e);
-        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, e.getMessage(), e));
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, BulkConstants.AMOUNT_FORMAT_EXCEPTION, e));
     
     }
 

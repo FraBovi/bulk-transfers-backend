@@ -76,7 +76,7 @@ public class TransferService {
         if (totalAmountTransfer > accountBalance) {
 
             logger.info("Operation not allowed - CREDIT NOT SUFFICIENT");
-            throw new CreditNotSufficientException("Credit not sufficient - Operation disallowed");
+            throw new CreditNotSufficientException();
 
         }
 

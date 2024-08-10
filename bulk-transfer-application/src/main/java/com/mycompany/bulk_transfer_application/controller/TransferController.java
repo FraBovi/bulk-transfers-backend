@@ -24,7 +24,6 @@ import com.mycompany.bulk_transfer_application.exception.AmountFormatException;
 import com.mycompany.bulk_transfer_application.exception.CreditNotSufficientException;
 import com.mycompany.bulk_transfer_application.service.TransferService;
 
-import jakarta.persistence.NoResultException;
 import jakarta.validation.Valid;
 
 /**
