@@ -50,16 +50,17 @@ public class TransferController {
      * 
      * @param transferRequest represents the body of the request
      * @return an entity with code 201 or 422 if the request can be processed
-     * @throws CreditNotSufficientException 
+     * @throws CreditNotSufficientException
      */
     @PostMapping(path = "/customer/transfers", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> bulkTransfer(@Valid @RequestBody Request transferRequest) throws CreditNotSufficientException, NumberFormatException {
+    public ResponseEntity<?> bulkTransfer(@Valid @RequestBody Request transferRequest)
+            throws CreditNotSufficientException, NumberFormatException {
 
         logger.info("Request for /customer/transfers arrived, with body {}", transferRequest);
 
         // call a service to handle the request
         try {
-            
+
             List<TransferEntity> response = transferService.insertTransfers(transferRequest);
             logger.info("Sending response {}", response);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -70,13 +71,18 @@ public class TransferController {
 
     }
 
-    // TODO: use also the organizationName to lookup the record (handle it in the
-    // lower levels)
-    // MEET 02-08 
+    // BUG: it returns me 500 status code
+    /*
+     * {
+     * "code": "INTERNAL_SERVER_ERROR",
+     * "message": "No static resource api/accounts."
+     * }
+     */
     @GetMapping(path = "/accounts", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> searchAccount(@ModelAttribute SearchParameters params) {
 
-        logger.info("Request for /accounts arrived, with params IBAN {} - BIC {} - NAME {}", params.getIban(),params.getBic(), params.getName());
+        logger.info("Request for /accounts arrived, with params IBAN {} - BIC {} - NAME {}", params.getIban(),
+                params.getBic(), params.getName());
 
         // call a service to handle the request
         List<BankAccount> accounts = transferDAO.searchBankAccounts(params);
