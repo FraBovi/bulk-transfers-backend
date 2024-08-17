@@ -44,16 +44,28 @@ public class TransferDAO {
      */
     public List<BankAccount> searchBankAccounts(SearchParameters params) {
 
-        String sqlQuery = "from BankAccount where iban = :iban OR bic = :bic OR organizationName = :organizationName";
+        String bic = params.getBic();
+        String iban = params.getIban();
+        String organizationName = params.getName();
+
+        String sqlQuery = "";
+
+        if(bic == null && iban == null && organizationName == null) {
+
+            sqlQuery = "from BankAccount";
+            TypedQuery<BankAccount> query = entityManager.createQuery(sqlQuery, BankAccount.class);
+
+            return query.getResultList();
+
+        }
+
+        sqlQuery = "from BankAccount where iban = :iban OR bic = :bic OR organizationName = :organizationName";
         TypedQuery<BankAccount> query = entityManager.createQuery(sqlQuery, BankAccount.class);
-        query.setParameter("iban", params.getIban());
-        query.setParameter("bic", params.getBic());
-        query.setParameter("organizationName", params.getName());
+        query.setParameter("iban", iban);
+        query.setParameter("bic", bic);
+        query.setParameter("organizationName", organizationName);
 
-        List<BankAccount> accounts = null;
-        accounts = query.getResultList();
-
-        return accounts;
+        return query.getResultList();
     }
 
     /**
