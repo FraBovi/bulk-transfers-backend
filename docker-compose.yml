@@ -1,6 +1,3 @@
-# FIXME: if I run the `start.sh` script it doesn't work.
-# FIXME: I also tried `docker-compose up mysqldb` with no luck.
-# TODO: https://askubuntu.com/questions/1508129/docker-compose-giving-containerconfig-errors-after-update-today
 services:
   mysqldb:
     image: "mysql:8.0"

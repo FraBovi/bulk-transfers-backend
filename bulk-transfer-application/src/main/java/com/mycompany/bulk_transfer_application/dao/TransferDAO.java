@@ -42,6 +42,9 @@ public class TransferDAO {
      * 
      * @return BankAccount class with DB info
      */
+    // FIXME: adjust this search by providing the option to specify the logical
+    // operator (AND vs OR).
+    // As an example you can have a look at something like Sieve (in C#/.NET)
     public List<BankAccount> searchBankAccounts(SearchParameters params) {
 
         String bic = params.getBic();
@@ -50,7 +53,7 @@ public class TransferDAO {
 
         String sqlQuery = "";
 
-        if(bic == null && iban == null && organizationName == null) {
+        if (bic == null && iban == null && organizationName == null) {
 
             sqlQuery = "from BankAccount";
             TypedQuery<BankAccount> query = entityManager.createQuery(sqlQuery, BankAccount.class);
