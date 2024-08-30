@@ -1,6 +1,24 @@
 {
     "configurations": [
         {
+            "name": "integration-test",
+            "type": "go",
+            "request": "launch",
+            "mode": "test",
+            "program": "${fileDirname}",
+            "env": {
+                "TESTCONTAINERS_RYUK_DISABLED": "true"
+            },
+            "buildFlags": [
+                "-tags=integration"
+            ],
+            "args": [
+                "-test.v",
+                "-test.run",
+                "TestSearchAccount"
+            ]
+        },
+        {
             "type": "java",
             "name": "Spring Boot-BulkTransferApplication<bulk-transfer-application>",
             "request": "launch",
@@ -9,6 +27,6 @@
             "projectName": "bulk-transfer-application",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
-        }
+        },
     ]
 }
