@@ -8,7 +8,7 @@
             "program": "${fileDirname}",
             "env": {
                 "TESTCONTAINERS_RYUK_DISABLED": "true",
-                "TESTCONTAINERS_HOST_OVERRIDE": "host.docker.internal"
+                // "TESTCONTAINERS_HOST_OVERRIDE": "host.docker.internal"
             },
             "buildFlags": [
                 "-tags=integration"
