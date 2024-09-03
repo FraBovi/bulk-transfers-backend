@@ -7,7 +7,6 @@ import (
 	"database/sql"
 	"net/http"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/require"
 	tc "github.com/testcontainers/testcontainers-go/modules/compose"
@@ -17,15 +16,15 @@ import (
 
 func TestSearchAccount(t *testing.T) {
 	compose, err := tc.NewDockerComposeWith(tc.WithStackFiles("../docker-compose.yml"))
-	if err != nil {
-		require.NoError(t, err, "NewDockerComposeAPI()")
-	}
+	require.NoError(t, err, "NewDockerComposeAPI()")
 	t.Cleanup(func() {
 		require.NoError(t, compose.Down(context.Background(), tc.RemoveOrphans(true), tc.RemoveImagesLocal), "compose.Down()")
 	})
 	ctx, cancel := context.WithCancel(context.Background())
 	t.Cleanup(cancel)
-	err = compose.WaitForService("api_service", wait.NewHTTPStrategy("/").WithPort("8080/tcp").WithStartupTimeout(10*time.Second)).Up(ctx, tc.Wait(true))
+	err = compose.
+		WaitForService("api_service", wait.ForListeningPort("8080/tcp")).
+		Up(ctx, tc.Wait(true))
 	require.NoError(t, err)
 	sqlClient, err := sql.Open("mysql", "root:root@tcp(127.0.0.1:3307)/transfers_db")
 	require.NoError(t, err)
