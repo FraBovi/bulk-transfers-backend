@@ -1,3 +1,5 @@
+//go:build integration
+
 package integration_test
 
 import (
@@ -58,6 +60,17 @@ var _ = Describe("integration tests accounts", Ordered, func() {
 			Expect(err).Should(BeNil())
 			Expect(res).To(HaveHTTPStatus(http.StatusOK))
 			Expect(res).To(HaveHTTPBody("[]"))
+		})
+	})
+
+	When("HTTP is not valid", func() {
+		It("return validation error", func() {
+			client := http.Client{}
+			r, err := http.NewRequest(http.MethodGet, "http://127.0.0.1:8080/api/accounts?iban=abcd", nil)
+			Expect(err).Should(BeNil())
+			res, err := client.Do(r)
+			Expect(err).Should(BeNil())
+			Expect(res).To(HaveHTTPStatus(http.StatusBadRequest))
 		})
 	})
 })
