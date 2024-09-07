@@ -43,9 +43,12 @@ public class TransferService {
      * 
      * @param request represents the request JSON
      * @return Response which can be with code 1 for successful and -99 otherwise
-     * @throws CreditNotSufficientException 
+     * @throws CreditNotSufficientException
      */
-    public List<TransferEntity> insertTransfers(Request request) throws CreditNotSufficientException, NumberFormatException {
+    // FIXME: double-check the code in this method to assess if we're doing the
+    // right operations in the right order.
+    public List<TransferEntity> insertTransfers(Request request)
+            throws CreditNotSufficientException, NumberFormatException {
 
         String organizationBic = request.getOrganizationBic();
         String organizationIban = request.getOrganizationIban();
@@ -57,9 +60,10 @@ public class TransferService {
         // Getting BankAccount info from DB using BIC and IBAN
         List<BankAccount> accountsFound = transferDAO.searchBankAccounts(searchParameters);
 
-        if(accountsFound.isEmpty()) throw new NoBankAccountFoundException();
+        if (accountsFound.isEmpty())
+            throw new NoBankAccountFoundException();
 
-        BankAccount account = accountsFound.get(0); 
+        BankAccount account = accountsFound.get(0);
 
         logger.info("Bank Account information retrieved {}", account);
 
@@ -94,6 +98,7 @@ public class TransferService {
             newTransfers.add(transferEntity);
 
             accountBalance -= transferEntity.getAmountCents();
+            // FIXME: avoid updating after each row has been added
             account.setBalanceCents(accountBalance.toString());
 
             logger.info("Update bank account {} in DB", account);

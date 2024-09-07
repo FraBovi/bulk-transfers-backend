@@ -26,6 +26,8 @@ import com.mycompany.bulk_transfer_application.service.TransferService;
 
 import jakarta.validation.Valid;
 
+// TODO: implement some automated tests (up to you: unit tests, integration tests)
+// maybe, let's start with a unit test and an integration test.
 /**
  * TransferController handles all the request that have /api as prefix
  */
@@ -71,7 +73,9 @@ public class TransferController {
 
     }
 
-    // BUG: it returns me 500 status code
+    // FIXME: implement validations on the query params (e.g. "iban" must be a valid
+    // IBAN, "name" must not be empty if set. optional: "bic" validation). If errors
+    // happen, return 400 BadRequest error.
     /*
      * {
      * "code": "INTERNAL_SERVER_ERROR",

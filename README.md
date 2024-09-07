@@ -1,5 +1,7 @@
 # Bulk Transfer Application
 
+# TODO: beautify this readme.md file by making it compliance with the Markdown syntax rules.
+
 >
 > ***This is a very simple application implemented using Java Spring Boot and SQL as DB***
 >
@@ -30,7 +32,7 @@
     - **Method**: `GET`
     - **Description**: When no query parameters are provided, the endpoint returns a list of all bank accounts in the database.
 
-    2. **Filter Accounts by Parameters**:  
+    1. **Filter Accounts by Parameters**:  
     - **Method**: `GET`
     - **Description**: The endpoint supports optional query string parameters—`iban`, `bic`, and `name`. When one or more of these parameters are provided, the endpoint returns accounts that match any of the specified criteria (using an OR logic).
 
