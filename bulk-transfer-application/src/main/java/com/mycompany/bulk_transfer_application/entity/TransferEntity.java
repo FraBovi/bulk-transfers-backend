@@ -9,6 +9,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 /**
  * TransferEntity class represent 'transfers' table in DB
@@ -16,6 +17,7 @@ import lombok.Data;
 @Entity
 @Table(name = "transfers")
 @Data
+@Accessors(chain = true)
 public class TransferEntity {
 	
 	@Id

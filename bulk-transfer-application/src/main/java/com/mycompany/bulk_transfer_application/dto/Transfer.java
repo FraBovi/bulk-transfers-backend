@@ -1,6 +1,9 @@
 package com.mycompany.bulk_transfer_application.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.mycompany.bulk_transfer_application.BulkUtils;
+import com.mycompany.bulk_transfer_application.entity.BankAccount;
+import com.mycompany.bulk_transfer_application.entity.TransferEntity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,5 +29,15 @@ public class Transfer {
 	
 	@JsonProperty("description")
 	private String description;
+
+	public TransferEntity toTransferEntity(BankAccount account) {
+		return new TransferEntity()
+			.setBankAccountId(account)
+			.setCounterpartyName(counterpartyName)
+			.setCounterpartyBic(counterpartyBic)
+			.setDescription(description)
+			.setCounterpartyIban(counterpartyIban)
+			.setAmountCents(BulkUtils.getCentsOfEuros(amount));
+	}
 
 }

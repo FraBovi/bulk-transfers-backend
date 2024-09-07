@@ -83,7 +83,7 @@ public class TransferController {
      * }
      */
     @GetMapping(path = "/accounts", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> searchAccount(@ModelAttribute SearchParameters params) {
+    public ResponseEntity<?> searchAccount(@Valid @ModelAttribute SearchParameters params) {
 
         logger.info("Request for /accounts arrived, with params IBAN {} - BIC {} - NAME {}", params.getIban(),
                 params.getBic(), params.getName());

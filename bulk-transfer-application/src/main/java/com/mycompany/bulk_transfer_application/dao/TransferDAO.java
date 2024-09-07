@@ -1,6 +1,7 @@
 package com.mycompany.bulk_transfer_application.dao;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -50,6 +51,7 @@ public class TransferDAO {
         String bic = params.getBic();
         String iban = params.getIban();
         String organizationName = params.getName();
+        String operationType = Optional.ofNullable(params.getType()).orElse("OR");
 
         String sqlQuery = "";
 
@@ -62,12 +64,14 @@ public class TransferDAO {
 
         }
 
-        sqlQuery = "from BankAccount where iban = :iban OR bic = :bic OR organizationName = :organizationName";
+        if(operationType.equals("OR")) sqlQuery = "from BankAccount where iban = :iban OR bic = :bic OR organizationName = :organizationName";
+        else sqlQuery = "from BankAccount where iban = :iban AND bic = :bic AND organizationName = :organizationName";
+        
         TypedQuery<BankAccount> query = entityManager.createQuery(sqlQuery, BankAccount.class);
         query.setParameter("iban", iban);
         query.setParameter("bic", bic);
         query.setParameter("organizationName", organizationName);
-
+    
         return query.getResultList();
     }
 

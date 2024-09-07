@@ -1,7 +1,5 @@
 package com.mycompany.bulk_transfer_application;
 
-import com.mycompany.bulk_transfer_application.exception.AmountFormatException;
-
 public class BulkUtils {
 
     /**

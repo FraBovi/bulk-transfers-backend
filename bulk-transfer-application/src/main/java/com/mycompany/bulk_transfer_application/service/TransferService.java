@@ -55,7 +55,7 @@ public class TransferService {
 
         logger.info("Getting bank account info from DB using BIC {} and IBAN {}", organizationBic, organizationIban);
 
-        SearchParameters searchParameters = new SearchParameters(organizationBic, organizationIban, null);
+        SearchParameters searchParameters = new SearchParameters(organizationBic, organizationIban);
 
         // Getting BankAccount info from DB using BIC and IBAN
         List<BankAccount> accountsFound = transferDAO.searchBankAccounts(searchParameters);
@@ -98,15 +98,15 @@ public class TransferService {
             newTransfers.add(transferEntity);
 
             accountBalance -= transferEntity.getAmountCents();
-            // FIXME: avoid updating after each row has been added
-            account.setBalanceCents(accountBalance.toString());
-
+            
             logger.info("Update bank account {} in DB", account);
-
+            
             transferDAO.updateBankAccount(account);
-
+            
         }
-
+        // FIXME: avoid updating after each row has been added
+        account.setBalanceCents(accountBalance.toString());
+        
         return newTransfers;
 
     }
@@ -131,17 +131,7 @@ public class TransferService {
      * @return the TransferEntity added in the DB table
      */
     private TransferEntity createTransferEntity(Transfer transfer, BankAccount account) throws NumberFormatException {
-
-        TransferEntity transferEntity = new TransferEntity();
-
-        transferEntity.setBankAccountId(account);
-        transferEntity.setCounterpartyName(transfer.getCounterpartyName());
-        transferEntity.setCounterpartyBic(transfer.getCounterpartyBic());
-        transferEntity.setDescription(transfer.getDescription());
-        transferEntity.setCounterpartyIban(transfer.getCounterpartyIban());
-        transferEntity.setAmountCents(BulkUtils.getCentsOfEuros(transfer.getAmount()));
-
-        return transferEntity;
+        return transfer.toTransferEntity(account);
     }
 
 }
