@@ -18,7 +18,7 @@ public class SearchParameters {
     @Pattern(regexp = "^[A-Z]{2}[A-Z0-9]{5,25}$", message = "Invalid IBAN")
     private String iban;
 
-    @NotBlank
+    @Pattern(regexp = "^$|\\S.*", message = "Name if present cannot be empty")
     private String name;
 
     @Pattern(regexp = "^(AND|OR)$", message = "Value must be either 'AND' or 'OR'")
