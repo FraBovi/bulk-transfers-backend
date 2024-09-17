@@ -1,7 +1,5 @@
 package com.mycompany.bulk_transfer_application.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,6 +24,10 @@ public class SearchParameters {
 
     public SearchParameters(String bic, String iban) {
         this.bic = bic;
+        this.iban = iban;
+    }
+
+    public SearchParameters(String iban) {
         this.iban = iban;
     }
     
