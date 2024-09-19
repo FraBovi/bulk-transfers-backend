@@ -17,5 +17,3 @@ Let me walk you through the setup needed to run the integration tests. The steps
 ## Technical Specs
 
 I used `ginkgo` and `gomega` to give them a try. This integration test project is a POC. Furthermore, the tests have been written against a `docker-compose.yml` file since I don't want to dig into the code. I took it for granted. What matters to me is the chance of building tests against an already "live" project with minimal setup. `testcontainers` ease a lot this process of setting containers up.
-
-<!-- TODO: I left a failing test in the suite since it's testing one feature you should work on. -->

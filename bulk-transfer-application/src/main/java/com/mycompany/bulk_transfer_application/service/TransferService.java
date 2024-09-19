@@ -25,113 +25,110 @@ import com.mycompany.bulk_transfer_application.exception.NoBankAccountFoundExcep
 @Service
 public class TransferService {
 
-    private static final Logger logger = LoggerFactory.getLogger(TransferService.class);
+  private static final Logger logger = LoggerFactory.getLogger(TransferService.class);
 
-    private TransferDAO transferDAO;
+  private TransferDAO transferDAO;
 
-    @Autowired
-    public TransferService(TransferDAO transferDAO) {
-        this.transferDAO = transferDAO;
-    }
+  @Autowired
+  public TransferService(TransferDAO transferDAO) {
+    this.transferDAO = transferDAO;
+  }
 
-    /**
-     * This function implements business logic in which at first the BankAccount
-     * info
-     * are retrieved from DB, using IBAN e BIC, then it checks if it's possible to
-     * handle
-     * the request and in that case updates the DB.
-     * 
-     * @param request represents the request JSON
-     * @return Response which can be with code 1 for successful and -99 otherwise
-     * @throws CreditNotSufficientException
-     */
-    // FIXME: double-check the code in this method to assess if we're doing the
-    // right operations in the right order.
-    public List<TransferEntity> insertTransfers(Request request)
-            throws CreditNotSufficientException, NumberFormatException {
+  /**
+   * This function implements business logic in which at first the BankAccount
+   * info
+   * are retrieved from DB, using IBAN e BIC, then it checks if it's possible to
+   * handle
+   * the request and in that case updates the DB.
+   * 
+   * @param request represents the request JSON
+   * @return Response which can be with code 1 for successful and -99 otherwise
+   * @throws CreditNotSufficientException
+   */
+  public List<TransferEntity> insertTransfers(Request request)
+      throws CreditNotSufficientException, NumberFormatException {
 
-        String organizationBic = request.getOrganizationBic();
-        String organizationIban = request.getOrganizationIban();
+    String organizationBic = request.getOrganizationBic();
+    String organizationIban = request.getOrganizationIban();
 
-        logger.info("Getting bank account info from DB using BIC {} and IBAN {}", organizationBic, organizationIban);
+    logger.info("Getting bank account info from DB using BIC {} and IBAN {}", organizationBic, organizationIban);
 
-        SearchParameters searchParameters = new SearchParameters(organizationBic, organizationIban);
+    SearchParameters searchParameters = new SearchParameters(organizationBic, organizationIban);
 
-        // Getting BankAccount info from DB using BIC and IBAN
-        List<BankAccount> accountsFound = transferDAO.searchBankAccounts(searchParameters);
+    // Getting BankAccount info from DB using BIC and IBAN
+    List<BankAccount> accountsFound = transferDAO.searchBankAccounts(searchParameters);
 
-        if (accountsFound.isEmpty())
-            throw new NoBankAccountFoundException();
+    if (accountsFound.isEmpty())
+      throw new NoBankAccountFoundException();
 
-        BankAccount account = accountsFound.get(0);
+    BankAccount account = accountsFound.get(0);
 
-        logger.info("Bank Account information retrieved {}", account);
+    logger.info("Bank Account information retrieved {}", account);
 
-        List<Transfer> incomingTransfers = request.getCreditTransfers();
+    List<Transfer> incomingTransfers = request.getCreditTransfers();
 
-        // Calculates the total amount need to handle the bulk transfer
-        Integer totalAmountTransfer = calculateTotalAmount(incomingTransfers);
-        Integer accountBalance = Integer.parseInt(account.getBalanceCents());
+    // Calculates the total amount need to handle the bulk transfer
+    Integer totalAmountTransfer = calculateTotalAmount(incomingTransfers);
+    Integer accountBalance = Integer.parseInt(account.getBalanceCents());
 
-        logger.info("Balance in cents {} - Total transfer amount in cents{}", accountBalance, totalAmountTransfer);
+    logger.info("Balance in cents {} - Total transfer amount in cents{}", accountBalance, totalAmountTransfer);
 
-        // If the organization has not enough money the bulk transfer is not allowed
-        // -99 is returned as response
-        if (totalAmountTransfer > accountBalance) {
+    // If the organization has not enough money the bulk transfer is not allowed
+    // -99 is returned as response
+    if (totalAmountTransfer > accountBalance) {
 
-            logger.info("Operation not allowed - CREDIT NOT SUFFICIENT");
-            throw new CreditNotSufficientException();
-
-        }
-
-        logger.info("Operation allowed");
-
-        List<TransferEntity> newTransfers = new ArrayList<>();
-
-        // For each transfer in the bulk we add it to DB and update organization balance
-        for (Transfer transfer : incomingTransfers) {
-
-            logger.info("Insert transfer {} in DB", transfer);
-
-            TransferEntity transferEntity = createTransferEntity(transfer, account);
-            transferDAO.insertTransfers(transferEntity);
-            newTransfers.add(transferEntity);
-
-            accountBalance -= transferEntity.getAmountCents();
-            
-            logger.info("Update bank account {} in DB", account);
-            
-            transferDAO.updateBankAccount(account);
-            
-        }
-        // FIXME: avoid updating after each row has been added
-        account.setBalanceCents(accountBalance.toString());
-        
-        return newTransfers;
+      logger.info("Operation not allowed - CREDIT NOT SUFFICIENT");
+      throw new CreditNotSufficientException();
 
     }
 
-    /**
-     * Calculates the total amount need to process the bulk transfer
-     * 
-     * @param transfers a list with all the transfers
-     * @return an integer with the total value of the bulk transfer
-     */
-    private Integer calculateTotalAmount(List<Transfer> transfers) throws NumberFormatException {
-        return transfers.stream().mapToInt(transfer -> BulkUtils.getCentsOfEuros(transfer.getAmount())).sum();
-    }
+    logger.info("Operation allowed");
 
-    /**
-     * Insert transfer in DB by combining the info of the request @param transfer
-     * and the @param account ID
-     * 
-     * @param transfer one of the transfer received in the bulk request
-     * @param account  the account performing the request
-     * 
-     * @return the TransferEntity added in the DB table
-     */
-    private TransferEntity createTransferEntity(Transfer transfer, BankAccount account) throws NumberFormatException {
-        return transfer.toTransferEntity(account);
+    List<TransferEntity> newTransfers = new ArrayList<>();
+
+    // For each transfer in the bulk we add it to DB and update organization balance
+    for (Transfer transfer : incomingTransfers) {
+
+      logger.info("Insert transfer {} in DB", transfer);
+
+      TransferEntity transferEntity = createTransferEntity(transfer, account);
+      transferDAO.insertTransfers(transferEntity);
+      newTransfers.add(transferEntity);
+
+      accountBalance -= transferEntity.getAmountCents();
+
+      logger.info("Update bank account {} in DB", account);
+
+      transferDAO.updateBankAccount(account);
+
     }
+    account.setBalanceCents(accountBalance.toString());
+
+    return newTransfers;
+
+  }
+
+  /**
+   * Calculates the total amount need to process the bulk transfer
+   * 
+   * @param transfers a list with all the transfers
+   * @return an integer with the total value of the bulk transfer
+   */
+  private Integer calculateTotalAmount(List<Transfer> transfers) throws NumberFormatException {
+    return transfers.stream().mapToInt(transfer -> BulkUtils.getCentsOfEuros(transfer.getAmount())).sum();
+  }
+
+  /**
+   * Insert transfer in DB by combining the info of the request @param transfer
+   * and the @param account ID
+   * 
+   * @param transfer one of the transfer received in the bulk request
+   * @param account  the account performing the request
+   * 
+   * @return the TransferEntity added in the DB table
+   */
+  private TransferEntity createTransferEntity(Transfer transfer, BankAccount account) throws NumberFormatException {
+    return transfer.toTransferEntity(account);
+  }
 
 }
