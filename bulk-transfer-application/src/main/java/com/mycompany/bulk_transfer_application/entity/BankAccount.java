@@ -8,11 +8,13 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * BankAccount class represent 'bank_accounts' table in DB
  */
 @AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "bank_accounts")
 @Data

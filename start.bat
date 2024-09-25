@@ -5,7 +5,7 @@ echo Downloading and updating Docker containers
 docker-compose pull
 
 :: Build any local images and pull the latest base images
-docker-compose build --pull
+docker compose build --pull --no-cache
 
 :: Bring up MySQL and Spring Boot application
 docker-compose up

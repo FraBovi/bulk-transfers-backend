@@ -1,5 +1,7 @@
 package com.mycompany.bulk_transfer_application.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,7 +18,7 @@ public class SearchParameters {
     @Pattern(regexp = "^[A-Z]{2}[A-Z0-9]{5,25}$", message = "Invalid IBAN")
     private String iban;
 
-    @Pattern(regexp = "^$|\\S.*", message = "Name if present cannot be empty")
+    @Pattern(regexp = ".{2,}", message = "Name must have at least 2 characters")
     private String name;
 
     @Pattern(regexp = "^(AND|OR)$", message = "Value must be either 'AND' or 'OR'")

@@ -9,12 +9,14 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
  * TransferEntity class represent 'transfers' table in DB
  */
 @Entity
+@NoArgsConstructor
 @Table(name = "transfers")
 @Data
 @Accessors(chain = true)
