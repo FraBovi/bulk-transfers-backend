@@ -21,7 +21,7 @@ services:
 
   api_service:
     build: .
-    container_name: springbootapp
+    container_name: api_service
     restart: always
     ports:
       - 8080:8080

@@ -29,84 +29,84 @@ import com.mycompany.bulk_transfer_application.dto.SearchParameters;
 import com.mycompany.bulk_transfer_application.entity.BankAccount;
 import com.mycompany.bulk_transfer_application.service.TransferService;
 
-
-@WebMvcTest(TransferController.class) //Thanks to this annotation Spring will fire up an App Context with the needed beans
+@WebMvcTest(TransferController.class) // Thanks to this annotation Spring will fire up an App Context with the needed
+                                      // beans
 class BulkTransferApplicationTests {
 
-	// In order to simulate HTTP requests
-	@Autowired
-	private MockMvc mockMvc;
-	
-	// Provided by Spring to map to and from JSON
-	@Autowired
-	private ObjectMapper objectMapper;
+  // In order to simulate HTTP requests
+  @Autowired
+  private MockMvc mockMvc;
 
-	@MockBean
-	private TransferService transferService;
+  // Provided by Spring to map to and from JSON
+  @Autowired
+  private ObjectMapper objectMapper;
 
-	@MockBean
-    private TransferDAO transferDAO;
+  @MockBean
+  private TransferService transferService;
 
+  @MockBean
+  private TransferDAO transferDAO;
 
-	@Test
-	void checkEndpointAvailable() throws Exception {
-		mockMvc.perform(get("/api/accounts")
-				.contentType("application/json"))
-				.andExpect(status().isOk());
-	}
+  @Test
+  void checkEndpointAvailable() throws Exception {
+    mockMvc.perform(get("/api/accounts")
+        .contentType("application/json"))
+        .andExpect(status().isOk());
+  }
 
-	@Test
-	void checkExistingIban_returnOkAndResponse() throws Exception {
+  @Test
+  void checkExistingIban_returnOkAndResponse() throws Exception {
 
-		SearchParameters params = new SearchParameters("IT10474608000005006107XXXXX");
-		List<BankAccount> getBankAccountsResult = new ArrayList<>();
-		getBankAccountsResult.add(new BankAccount(1, "COMPANY 1", "10000000", "IT10474608000005006107XXXXX", "OIVUSCLQXXX"));
+    SearchParameters params = new SearchParameters("IT10474608000005006107XXXXX");
+    List<BankAccount> getBankAccountsResult = new ArrayList<>();
+    getBankAccountsResult
+        .add(new BankAccount(1, "COMPANY 1", "10000000", "IT10474608000005006107XXXXX", "OIVUSCLQXXX"));
 
-		given(transferDAO.searchBankAccounts(params)).willReturn(getBankAccountsResult);
-		
-		MockHttpServletResponse response = mockMvc.perform(get("/api/accounts")
-				.contentType("application/json")
-				.param("iban", "IT10474608000005006107XXXXX"))
-				.andReturn().getResponse();
+    given(transferDAO.searchBankAccounts(params)).willReturn(getBankAccountsResult);
 
-		// map String to object
-		List<Map<String, Object>> jsonResponse = objectMapper.readValue(response.getContentAsString(), List.class);
+    MockHttpServletResponse response = mockMvc.perform(get("/api/accounts")
+        .contentType("application/json")
+        .param("iban", "IT10474608000005006107XXXXX"))
+        .andReturn().getResponse();
 
-		assertThat(response.getStatus(), equalTo(HttpStatus.OK.value()));
-		assertThat(jsonResponse, hasSize(1));
-		assertThat(jsonResponse.get(0).get("iban"), is("IT10474608000005006107XXXXX"));
-	}
+    // map String to object
+    List<Map<String, Object>> jsonResponse = objectMapper.readValue(response.getContentAsString(), List.class);
 
-	@Test
-	void checkIbanNotValidRequest_returnBadRequest() throws Exception {
-		
-		MockHttpServletResponse response = mockMvc.perform(get("/api/accounts")
-				.contentType("application/json")
-				.param("iban", "abcd"))
-				.andReturn().getResponse();
+    assertThat(response.getStatus(), equalTo(HttpStatus.OK.value()));
+    assertThat(jsonResponse, hasSize(1));
+    assertThat(jsonResponse.get(0).get("iban"), is("IT10474608000005006107XXXXX"));
+  }
 
-		assertThat(response.getStatus(), equalTo(HttpStatus.BAD_REQUEST.value()));
-	}
+  @Test
+  void checkIbanNotValidRequest_returnBadRequest() throws Exception {
 
-	@Test
-	void checkNotExistingCompanyByName_returnOkAndEmpty() throws Exception {
+    MockHttpServletResponse response = mockMvc.perform(get("/api/accounts")
+        .contentType("application/json")
+        .param("iban", "abcd"))
+        .andReturn().getResponse();
 
-		SearchParameters params = new SearchParameters();
-		params.setName("notexistentcompany");
+    assertThat(response.getStatus(), equalTo(HttpStatus.BAD_REQUEST.value()));
+  }
 
-		List<BankAccount> getBankAccountsResult = new ArrayList<>();
-		given(transferDAO.searchBankAccounts(params)).willReturn(getBankAccountsResult);
-		
-		MockHttpServletResponse response = mockMvc.perform(get("/api/accounts")
-				.contentType("application/json")
-				.param("name", "notexistentcompany"))
-				.andReturn().getResponse();
+  @Test
+  void checkNotExistingCompanyByName_returnOkAndEmpty() throws Exception {
 
-		// map String to object
-		List<Map<String, Object>> jsonResponse = objectMapper.readValue(response.getContentAsString(), List.class);
+    SearchParameters params = new SearchParameters();
+    params.setName("notexistentcompany");
 
-		assertThat(response.getStatus(), equalTo(HttpStatus.OK.value()));
-		assertThat(jsonResponse, hasSize(0));
-	}
+    List<BankAccount> getBankAccountsResult = new ArrayList<>();
+    given(transferDAO.searchBankAccounts(params)).willReturn(getBankAccountsResult);
+
+    MockHttpServletResponse response = mockMvc.perform(get("/api/accounts")
+        .contentType("application/json")
+        .param("name", "notexistentcompany"))
+        .andReturn().getResponse();
+
+    // map String to object
+    List<Map<String, Object>> jsonResponse = objectMapper.readValue(response.getContentAsString(), List.class);
+
+    assertThat(response.getStatus(), equalTo(HttpStatus.OK.value()));
+    assertThat(jsonResponse, hasSize(0));
+  }
 
 }

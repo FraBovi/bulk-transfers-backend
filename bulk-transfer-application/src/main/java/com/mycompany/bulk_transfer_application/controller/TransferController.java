@@ -26,8 +26,6 @@ import com.mycompany.bulk_transfer_application.service.TransferService;
 
 import jakarta.validation.Valid;
 
-// TODO: implement some automated tests (up to you: unit tests, integration tests)
-// maybe, let's start with a unit test and an integration test.
 /**
  * TransferController handles all the request that have /api as prefix
  */
@@ -35,63 +33,63 @@ import jakarta.validation.Valid;
 @RequestMapping("/api")
 public class TransferController {
 
-    private static final Logger logger = LoggerFactory.getLogger(TransferController.class);
+  private static final Logger logger = LoggerFactory.getLogger(TransferController.class);
 
-    private TransferService transferService;
+  private TransferService transferService;
 
-    private TransferDAO transferDAO;
+  private TransferDAO transferDAO;
 
-    @Autowired
-    public TransferController(TransferService transferService, TransferDAO transferDAO) {
-        this.transferService = transferService;
-        this.transferDAO = transferDAO;
+  @Autowired
+  public TransferController(TransferService transferService, TransferDAO transferDAO) {
+    this.transferService = transferService;
+    this.transferDAO = transferDAO;
+  }
+
+  /**
+   * function that handle a POST for bulk transfers
+   * 
+   * @param transferRequest represents the body of the request
+   * @return an entity with code 201 or 422 if the request can be processed
+   * @throws CreditNotSufficientException
+   */
+  @PostMapping(path = "/customer/transfers", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<?> bulkTransfer(@Valid @RequestBody Request transferRequest)
+      throws CreditNotSufficientException, NumberFormatException {
+
+    logger.info("Request for /customer/transfers arrived, with body {}", transferRequest);
+
+    // call a service to handle the request
+    try {
+
+      List<TransferEntity> response = transferService.insertTransfers(transferRequest);
+      logger.info("Sending response {}", response);
+      return ResponseEntity.status(HttpStatus.CREATED).body(response);
+
+    } catch (NumberFormatException e) {
+      throw new AmountFormatException();
     }
 
-    /**
-     * function that handle a POST for bulk transfers
-     * 
-     * @param transferRequest represents the body of the request
-     * @return an entity with code 201 or 422 if the request can be processed
-     * @throws CreditNotSufficientException
-     */
-    @PostMapping(path = "/customer/transfers", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> bulkTransfer(@Valid @RequestBody Request transferRequest)
-            throws CreditNotSufficientException, NumberFormatException {
+  }
 
-        logger.info("Request for /customer/transfers arrived, with body {}", transferRequest);
+  // FIXME: implement validations on the query params (e.g. "iban" must be a valid
+  // IBAN, "name" must not be empty if set. optional: "bic" validation). If errors
+  // happen, return 400 BadRequest error.
+  /*
+   * {
+   * "code": "INTERNAL_SERVER_ERROR",
+   * "message": "No static resource api/accounts."
+   * }
+   */
+  @GetMapping(path = "/accounts", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<?> searchAccount(@Valid @ModelAttribute SearchParameters params) {
 
-        // call a service to handle the request
-        try {
+    logger.info("Request for /accounts arrived, with params IBAN {} - BIC {} - NAME {}", params.getIban(),
+        params.getBic(), params.getName());
 
-            List<TransferEntity> response = transferService.insertTransfers(transferRequest);
-            logger.info("Sending response {}", response);
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    // call a service to handle the request
+    List<BankAccount> accounts = transferDAO.searchBankAccounts(params);
 
-        } catch (NumberFormatException e) {
-            throw new AmountFormatException();
-        }
-
-    }
-
-    // FIXME: implement validations on the query params (e.g. "iban" must be a valid
-    // IBAN, "name" must not be empty if set. optional: "bic" validation). If errors
-    // happen, return 400 BadRequest error.
-    /*
-     * {
-     * "code": "INTERNAL_SERVER_ERROR",
-     * "message": "No static resource api/accounts."
-     * }
-     */
-    @GetMapping(path = "/accounts", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> searchAccount(@Valid @ModelAttribute SearchParameters params) {
-
-        logger.info("Request for /accounts arrived, with params IBAN {} - BIC {} - NAME {}", params.getIban(),
-                params.getBic(), params.getName());
-
-        // call a service to handle the request
-        List<BankAccount> accounts = transferDAO.searchBankAccounts(params);
-
-        return ResponseEntity.status(HttpStatus.OK).body(accounts);
-    }
+    return ResponseEntity.status(HttpStatus.OK).body(accounts);
+  }
 
 }
