@@ -29,8 +29,8 @@ import com.mycompany.bulk_transfer_application.dto.SearchParameters;
 import com.mycompany.bulk_transfer_application.entity.BankAccount;
 import com.mycompany.bulk_transfer_application.service.TransferService;
 
-@WebMvcTest(TransferController.class) // Thanks to this annotation Spring will fire up an App Context with the needed
-                                      // beans
+// Thanks to this annotation Spring will fire up an App Context with the needed beans
+@WebMvcTest(TransferController.class)
 class BulkTransferApplicationTests {
 
   // In order to simulate HTTP requests
@@ -107,6 +107,15 @@ class BulkTransferApplicationTests {
 
     assertThat(response.getStatus(), equalTo(HttpStatus.OK.value()));
     assertThat(jsonResponse, hasSize(0));
+  }
+
+  @Test
+  void checkGetWithEmptyNameParam_returnBadRequest() throws Exception {
+
+    mockMvc.perform(get("/api/accounts")
+        .contentType("application/json")
+        .param("name", ""))
+        .andExpect(status().isBadRequest());
   }
 
 }
