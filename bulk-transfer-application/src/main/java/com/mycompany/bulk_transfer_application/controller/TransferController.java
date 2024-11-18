@@ -71,9 +71,6 @@ public class TransferController {
 
   }
 
-  // FIXME: implement validations on the query params (e.g. "iban" must be a valid
-  // IBAN, "name" must not be empty if set. optional: "bic" validation). If errors
-  // happen, return 400 BadRequest error.
   /*
    * {
    * "code": "INTERNAL_SERVER_ERROR",

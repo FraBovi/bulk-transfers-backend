@@ -4,7 +4,6 @@ package integration_test
 
 import (
 	"context"
-	"database/sql"
 	"encoding/json"
 	"net/http"
 	"os"
@@ -36,17 +35,10 @@ var _ = Describe("accounts", Ordered, func() {
 			composeErr = helpers.ReRunContainersAfterConflict(ctx, composeReq)
 		}
 		Expect(composeErr).Should(BeNil())
-		sqlClient, err := sql.Open("mysql", "root:root@tcp(127.0.0.1:3307)/transfers_db")
-		Expect(err).Should(BeNil())
-		DeferCleanup(func() {
-			Expect(sqlClient.Close()).Should(BeNil())
-		})
-		Expect(sqlClient.Ping()).Should(BeNil())
 	})
 
 	Describe("retrieving accounts", func() {
 		Context("HTTP request is valid", func() {
-			// FIXME: this doesn't work if you rebuild the containers with no cached image
 			It("return accounts if present in DB", func() {
 				client := http.Client{}
 				r, err := http.NewRequest(http.MethodGet, "http://127.0.0.1:8080/api/accounts?iban=IT10474608000005006107XXXXX", nil)
@@ -80,7 +72,6 @@ var _ = Describe("accounts", Ordered, func() {
 				Expect(res).To(HaveHTTPStatus(http.StatusBadRequest))
 			})
 
-			// FIXME: this is the new test that should be fixed
 			It("err with empty name", func() {
 				client := http.Client{}
 				r, err := http.NewRequest(http.MethodGet, "http://127.0.0.1:8080/api/accounts?name=", nil)
