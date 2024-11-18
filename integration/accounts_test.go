@@ -4,7 +4,6 @@ package integration_test
 
 import (
 	"context"
-	"database/sql"
 	"encoding/json"
 	"net/http"
 	"os"
@@ -36,12 +35,6 @@ var _ = Describe("accounts", Ordered, func() {
 			composeErr = helpers.ReRunContainersAfterConflict(ctx, composeReq)
 		}
 		Expect(composeErr).Should(BeNil())
-		sqlClient, err := sql.Open("mysql", "root:root@tcp(127.0.0.1:3307)/transfers_db")
-		Expect(err).Should(BeNil())
-		DeferCleanup(func() {
-			Expect(sqlClient.Close()).Should(BeNil())
-		})
-		Expect(sqlClient.Ping()).Should(BeNil())
 	})
 
 	Describe("retrieving accounts", func() {
