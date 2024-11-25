@@ -1,0 +1,14 @@
+{
+  "organization_name": "COMPANY 1",
+  "organization_bic": "OIVUSCLQXXX",
+  "organization_iban": "IT10474608000005006107XXXXX",
+  "credit_transfers": [
+    {
+      "amount": "14.5",
+      "counterparty_name": "COUNTERPARTY 1",
+      "counterparty_bic": "CRLYFTTTOU",
+      "counterparty_iban": "EE383680981021245685",
+      "description": "Telephone Company"
+    }
+  ]
+}
