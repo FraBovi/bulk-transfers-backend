@@ -96,13 +96,12 @@ public class TransferService {
       newTransfers.add(transferEntity);
 
       accountBalance -= transferEntity.getAmountCents();
+      account.setBalanceCents(accountBalance.toString());
+      transferDAO.updateBankAccount(account);
 
       logger.info("Update bank account {} in DB", account);
 
-      transferDAO.updateBankAccount(account);
-
     }
-    account.setBalanceCents(accountBalance.toString());
 
     return newTransfers;
 
